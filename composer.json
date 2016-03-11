@@ -1,5 +1,5 @@
 {
-    "name": "vhchung/slim3-skeleton-mvc",
+    "name": "agustim/slim3-skeleton-mvc",
     "description": "Simple Slim Framework 3 skeleton with Twig, Monolog, Doctrine in Sqlite.",
     "license": "MIT",
     "type": "project",
