@@ -1,0 +1,27 @@
+{
+    "name": "vhchung/slim3-skeleton-mvc",
+    "description": "Simple Slim Framework 3 skeleton with Twig, Monolog, Doctrine.",
+    "license": "MIT",
+    "type": "project",
+    "keywords": ["slim-framework", "skeleton", "mvc"],
+    "authors": [
+        {
+            "name": "Vu Hoang Chung",
+            "email": "chung.it@live.com",
+            "homepage": "http://chungvh.xyz"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\Controller\\": "app/src/controllers",
+            "App\\Model\\": "app/src/models"
+        }
+    },
+    "require": {
+        "slim/slim": "~3.0",
+        "slim/twig-view": "^2.0",
+        "slim/flash": "^0.1.0",
+        "monolog/monolog": "^1.17",
+        "doctrine/orm": "2.5.*"
+    }
+}
