@@ -1,14 +1,14 @@
 {
     "name": "vhchung/slim3-skeleton-mvc",
-    "description": "Simple Slim Framework 3 skeleton with Twig, Monolog, Doctrine.",
+    "description": "Simple Slim Framework 3 skeleton with Twig, Monolog, Doctrine in Sqlite.",
     "license": "MIT",
     "type": "project",
-    "keywords": ["slim-framework", "skeleton", "mvc"],
+    "keywords": ["slim-framework", "skeleton", "mvc", "sqlite"],
     "authors": [
         {
-            "name": "Vu Hoang Chung",
-            "email": "chung.it@live.com",
-            "homepage": "http://chungvh.xyz"
+            "name": "Agustí Moll i Garcia",
+            "email": "agusti@mollcarbo.name",
+            "homepage": "http://github.com/agustim"
         }
     ],
     "autoload": {
