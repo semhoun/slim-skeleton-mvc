@@ -34,5 +34,16 @@ return [
             'name' => 'app',
             'path' => __DIR__ . '/../log/app.log',
         ],
+
+		// JWT
+		'jwt' => [
+			'path' => ['/member'],
+            'ignore' => ["/member/login"],
+            'secret' => 'supersecretkeyyoushouldnotcommittogithub',
+            'validity' => 3600,
+            'refresh' => 1800, /* Refresh the jwt/cookie each */
+            'relaxed' => ['127.0.0.1', 'localhost', 'slim3.dev.local'], /* Url without HTTPS check */
+            'algorithm' => 'HS256'
+        ]
     ],
 ];

@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use Slim\Container;
+
 class BaseController
 {
     protected $view;
     protected $logger;
     protected $flash;
     protected $em;  // Entities Manager
+    protected $token;
 
     public function __construct(Container $c)
     {
@@ -16,5 +18,6 @@ class BaseController
         $this->logger = $c->get('logger');
         $this->flash = $c->get('flash');
         $this->em = $c->get('em');
+        $this->token = $c->get('token');
     }
 }

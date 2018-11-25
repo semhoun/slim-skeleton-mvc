@@ -1,39 +1,39 @@
 # Slim 3 MVC Skeleton
 
-This is a simple skeleton project for Slim 3 that includes Doctrine, Twig, Flash messages and Monolog.
+This is a simple skeleton project for Slim 3 that includes Doctrine, Twig, Flash messages, Monolog and token authentication
 
-Base on https://github.com/akrabat/slim3-skeleton
-and https://github.com/vhchung/slim3-skeleton-mvc
+Base on agustim/slim3-skeleton-mvc-sqlite
 
 ## Prepare
 
 1. Create your project:
 
-       `$ composer create-project -n -s dev agustim/slim3-skeleton-mvc-sqlite your-app`
 
-2. Create database: `$ cat sql/blog.sql | sqlite3 sql/blog.sqlite`
-3. Generate models (Doctrine entities):
-
+   ```bash
+   composer create-project -n -s dev semhoun/slim3-skeleton-mvc your-app
+   ```
+2. Copy the settings file `cp app/settings.php.dist app/settings.php`
+3. Create database: `cat sql/blog.sql | sqlite3 sql/blog.sqlite`
+4. Generate models (Doctrine entities):
+```bash
+cd your-app
+php entities_generator.php
 ```
+Add namespace for each model: `namespace App\Model;` maybe with this command: `sed -i 's/<?php/<?php\nnamespace App\\Model;/' app/src/models/*`
 
-$ cd your-app
-$ php entities_generator.php
+Notice: Delete all models before re-generate to update models.
 
-```
+## Run it:
 
- Add namespace for each model: `namespace App\Model;`
-
- Notice: Delete all models before re-generate to update models.
-
-### Run it:
-
-1. `$ cd your-app`
-2. `$ php -S 0.0.0.0:8888 -t public/`
+1. `cd your-app`
+2. `php -S 0.0.0.0:8888 -t public/`
 3. Browse to http://localhost:8888
 
 ### Notice
 
 Set `logs` and `cache` folder permission to writable when deploy to production environment
+
+Default login/password is *admin*/*admin*
 
 ## Key directories
 

@@ -1,6 +1,6 @@
+app/settings.php
 vendor/
 log/*
 cache/*
-app/src/models/
 sql/*.sqlite
 composer.lock

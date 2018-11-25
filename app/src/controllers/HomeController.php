@@ -1,18 +1,25 @@
 <?php
 namespace App\Controller;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Http\Request;
+use Slim\Http\Response;
 
 final class HomeController extends BaseController
 {
-    public function dispatch(Request $request, Response $response, $args)
+    public function index(Request $request, Response $response, $args)
     {
         $this->logger->info("Home page action dispatched");
 
         $this->flash->addMessage('info', 'Sample flash message');
 
-        $this->view->render($response, 'home.twig');
+        $this->view->render($response, 'home/index.twig');
+        return $response;
+    }
+
+    public function login(Request $request, Response $response, $args)
+    {
+        $messages = $this->flash->getMessage('error');
+        $this->view->render($response, 'home/login.twig', ['flash' => $messages]);
         return $response;
     }
 
@@ -29,7 +36,10 @@ final class HomeController extends BaseController
             die;
         }
 
-        $this->view->render($response, 'post.twig', ['post' => $post, 'flash' => $messages]);
+        $token = null;
+        if ($this->token->logged()) $token = $this->token->data();
+
+        $this->view->render($response, 'home/post.twig', ['post' => $post, 'flash' => $messages, 'token' => $token]);
         return $response;
     }
 }

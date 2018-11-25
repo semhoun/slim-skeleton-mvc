@@ -1,0 +1,34 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Slim 3</title>
+		<link href='//fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
+		<link href='{{ base_url() }}/css/style.css' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+		<h1>Slim</h1>
+
+		{% if flash %}
+			<div style="margin:30px auto;color:red">
+				{% for f in flash %}
+					<p>{{ f }}</p>
+				{% endfor %}
+			</div>
+		{% endif %}
+
+
+		<h2>Login</h2>
+
+		<div class="login">
+			<form action="/member/login" method="post">
+				<label for="uname"><b>Username</b></label>
+				<input type="text" placeholder="Enter Username" name="uname" required>
+
+				<label for="pswd"><b>Password</b></label>
+				<input type="password" placeholder="Enter Password" name="pswd" required>
+
+				<button type="submit">Login</button>
+			</form>
+		</div>
+	</body>
+</html>

@@ -1,27 +1,31 @@
 {
     "name": "agustim/slim3-skeleton-mvc-sqlite",
-    "description": "Simple Slim Framework 3 skeleton with Twig, Monolog, Doctrine in Sqlite.",
+    "description": "Simple Slim Framework 3 skeleton with Twig, Monolog, Doctrine in Sqlite, JWT authentication.",
     "license": "MIT",
     "type": "project",
-    "keywords": ["slim-framework", "skeleton", "mvc", "sqlite"],
+    "keywords": ["slim-framework", "skeleton", "mvc", "sqlite", "twig", "monolog", "doctrine", "jwt authentication"],
     "authors": [
         {
-            "name": "Agustí Moll i Garcia",
-            "email": "agusti@gmail.com",
-            "homepage": "http://github.com/agustim"
+            "name": "Nathanael Semhoun",
+            "email": "nathanael@semhoun.net",
+            "homepage": "http://www.semhoun.net"
         }
     ],
     "autoload": {
         "psr-4": {
             "App\\Controller\\": "app/src/controllers",
-            "App\\Model\\": "app/src/models"
+            "App\\Model\\": "app/src/models",
+			"App\\Lib\\": "app/src/libs"
         }
     },
     "require": {
-        "slim/slim": "~3.0",
-        "slim/twig-view": "^2.0",
-        "slim/flash": "^0.1.0",
-        "monolog/monolog": "^1.17",
-        "doctrine/orm": "2.5.*"
+        "slim/slim": "^3.1",
+        "slim/twig-view": "^2.4",
+        "slim/flash": "^0.4.0",
+        "monolog/monolog": "^1.24",
+        "doctrine/orm": "^2",
+        "tuupola/slim-jwt-auth": "^3.1",
+        "ramsey/uuid": "^3.8",
+        "dflydev/fig-cookies": "^1.0"
     }
 }
