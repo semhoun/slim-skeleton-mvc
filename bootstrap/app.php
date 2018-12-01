@@ -9,12 +9,12 @@ if (PHP_SAPI == 'cli-server') {
     }
 }
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 session_start();
 
 // Instantiate the app
-$settings = require __DIR__ . '/app/settings.php';
+$settings = require __DIR__ . '/settings.php';
 $c = new \Slim\Container($settings);
 $c['notFoundHandler'] = function ($c) {
     return function ($request, $response) use ($c) {
@@ -24,16 +24,16 @@ $c['notFoundHandler'] = function ($c) {
 $app = new \Slim\App($c);
 
 // Set up dependencies
-require __DIR__ . '/app/dependencies.php';
+require __DIR__ . '/dependencies.php';
 
 // Register middleware
-require __DIR__ . '/app/middleware.php';
+require __DIR__ . '/middleware.php';
 
 // Register controller factories
-require __DIR__ . '/app/controller.php';
+require __DIR__ . '/controller.php';
 
 // Register routes
-require __DIR__ . '/app/routes.php';
+require __DIR__ . '/routes.php';
 
 // Run!
 $app->run();

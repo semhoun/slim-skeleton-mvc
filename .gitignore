@@ -1,4 +1,4 @@
-app/settings.php
+boostrap/settings.php
 vendor/
 log/*
 cache/*

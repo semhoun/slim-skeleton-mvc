@@ -16,7 +16,7 @@ $container['JwtAuthentication'] = function ($c) {
         'relaxed' => $settings['jwt']['relaxed'],
         'attribute' => false,
         'error' => function ($response, $arguments) use ($c) {
-            return $c->get( 'App\Controller\ErrorController')->E401(null, $response, $arguments);
+            return $c->get('App\Controller\ErrorController')->E401(null, $response, $arguments);
         },
         'before' => function ($request, $arguments) use ($c) {
             $c['token']->populate($arguments['decoded']);

@@ -5,7 +5,7 @@ return [
         'displayErrorDetails' => true,
         // View settings
         'view' => [
-            'template_path' => __DIR__ . '/templates',
+            'template_path' => __DIR__ . '/../app/templates',
             'twig' => [
                 'cache' => __DIR__ . '/../cache/twig',
                 'debug' => true,
@@ -42,7 +42,7 @@ return [
             'secret' => 'supersecretkeyyoushouldnotcommittogithub',
             'validity' => 3600,
             'refresh' => 1800, /* Refresh the jwt/cookie each */
-            'relaxed' => ['127.0.0.1', 'localhost', 'slim3.dev.local'], /* Url without HTTPS check */
+            'relaxed' => ['127.0.0.1', 'localhost', 'slim3.dev.e-dune.info'], /* Url without HTTPS check */
             'algorithm' => 'HS256'
         ]
     ],
