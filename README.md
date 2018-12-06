@@ -14,8 +14,8 @@ Base on agustim/slim3-skeleton-mvc-sqlite
    ```
 2. Copy the settings file `cp config/settings.php.dist config/settings.php`
 3. Create database: `cat sql/blog.sql | sqlite3 var/blog.sqlite`
-4. Generate models (Doctrine entities): `php bin/entities_generator.php`
-:warning: *Delete all models before re-generate to update models.*
+4. Generate Doctrine entities: `php bin/entities_generator.php`
+:warning: *Delete all entities before re-generate to update entities.*
 
 ## Run it:
 
@@ -25,28 +25,32 @@ Base on agustim/slim3-skeleton-mvc-sqlite
 
 ### Notice
 
-Set `logs` and `cache` folder permission to writable when deploy to production environment
+Set `var`folder permission to writable when deploy to production environment
 
 Default login/password is *admin*/*admin*
 
 ## Key directories
 
-* `app`: Application code
-* `app/src`: All class files within the `App` namespace
-* `app/templates`: Twig template files
-* `cache/twig`: Twig's Autocreated cache files
-* `log`: Log files
+* `bin`:Application tools
+* `config`: Application middleware and general settings
+* `src`: Application code
+* `src/Controller`: All Controller files
+* `src/Entity`: Doctrine entities
+* `src/Lib`: Authentication libraries
+* `templates`: Twig template files
+* `var/cache/twig`: Twig's Autocreated cache files
+* `var/log`: Log files
 * `public`: Webserver root
 * `vendor`: Composer dependencies
 * `sql`: sql dump file for sample database
 
 ## Key files
 
-* `public/index.php`: Entry point to application
-* `app/settings.php`: Configuration
-* `app/dependencies.php`: Services for Pimple
-* `app/middleware.php`: Application middleware
-* `app/routes.php`: All application routes are here
-* `app/src/controllers/HomeController.php`: Controller class for the home page
-* `app/src/models/Post.php`: Entity class for post table
-* `app/templates/home.twig`: Twig template file for the home page
+* `public/index.php`: Entry point  to application and bootstrap
+* `config/settings.php`: Configuration
+* `config/dependencies.php`: Services for Pimple
+* `config/middleware.php`: Application middleware
+* `config/routes.php`: All application routes are here
+* `src/Controller/HomeController.php`: Controller class for the home page
+* `src/Entity/Post.php`: Entity class for post table
+* `templates/home.twig`: Twig template file for the home page
