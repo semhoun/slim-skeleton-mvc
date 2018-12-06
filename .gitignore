@@ -1,6 +1,7 @@
-boostrap/settings.php
+\.ac-php-conf\.json
+config/settings.php
 vendor/
-log/*
-cache/*
+var/*
 sql/*.sqlite
 composer.lock
+src/Entity/*

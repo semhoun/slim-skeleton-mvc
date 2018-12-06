@@ -4,8 +4,8 @@ namespace App\Lib;
 
 use Slim\Container;
 use Slim\Http\Response;
-use App\Model\User;
-use App\Model\Acl;
+use App\Entity\User;
+use App\Entity\Acl;
 use Firebase\JWT\JWT;
 use Ramsey\Uuid\Uuid;
 use Dflydev\FigCookies\FigResponseCookies;

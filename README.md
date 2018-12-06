@@ -1,6 +1,6 @@
 # Slim 3 MVC Skeleton
 
-This is a simple skeleton project for Slim 3 that includes Doctrine, Twig, Flash messages, Monolog and token authentication
+This is a simple skeleton project for Slim 3 that includes Doctrine, Twig, Flash messages, Monolog and JWT token authentication
 
 Base on agustim/slim3-skeleton-mvc-sqlite
 
@@ -12,16 +12,10 @@ Base on agustim/slim3-skeleton-mvc-sqlite
    ```bash
    composer create-project -n -s dev semhoun/slim3-skeleton-mvc your-app
    ```
-2. Copy the settings file `cp app/settings.php.dist app/settings.php`
-3. Create database: `cat sql/blog.sql | sqlite3 sql/blog.sqlite`
-4. Generate models (Doctrine entities):
-```bash
-cd your-app
-php entities_generator.php
-```
-Add namespace for each model: `namespace App\Model;` maybe with this command: `sed -i 's/<?php/<?php\nnamespace App\\Model;/' app/src/models/*`
-
-Notice: Delete all models before re-generate to update models.
+2. Copy the settings file `cp config/settings.php.dist config/settings.php`
+3. Create database: `cat sql/blog.sql | sqlite3 var/blog.sqlite`
+4. Generate models (Doctrine entities): `php bin/entities_generator.php`
+:warning: *Delete all models before re-generate to update models.*
 
 ## Run it:
 

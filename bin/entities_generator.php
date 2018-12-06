@@ -1,20 +1,20 @@
 <?php
-include __DIR__ . '/vendor/autoload.php';
+$namespace = "App\\Entity";
+
+include __DIR__ . '/../vendor/autoload.php';
+$settings = require __DIR__ . '/../config/settings.php';
+
 $classLoader = new \Doctrine\Common\ClassLoader('Entities', __DIR__);
 $classLoader->register();
 $classLoader = new \Doctrine\Common\ClassLoader('Proxies', __DIR__);
 $classLoader->register();
 // config
 $config = new \Doctrine\ORM\Configuration();
-$config->setMetadataDriverImpl($config->newDefaultAnnotationDriver(__DIR__ . '/app/src/models'));
+$config->setMetadataDriverImpl($config->newDefaultAnnotationDriver(__DIR__ . '/../src/Entity'));
 $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache);
-$config->setProxyDir(__DIR__ . '/Proxies');
+$config->setProxyDir(__DIR__ . '/../var/proxies');
 $config->setProxyNamespace('Proxies');
-$connectionParams = array(
-    'driver' => 'pdo_sqlite',
-    'path' => __DIR__.'/sql/blog.sqlite'
-);
-$em = \Doctrine\ORM\EntityManager::create($connectionParams, $config);
+$em = \Doctrine\ORM\EntityManager::create($settings['settings']['doctrine']['connection'], $config);
 // custom datatypes (not mapped for reverse engineering)
 $em->getConnection()->getDatabasePlatform()->registerDoctrineTypeMapping('set', 'string');
 $em->getConnection()->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
@@ -31,7 +31,17 @@ $generator = new Doctrine\ORM\Tools\EntityGenerator();
 $generator->setUpdateEntityIfExists(true);
 $generator->setGenerateStubMethods(true);
 $generator->setGenerateAnnotations(true);
-$generator->generate($metadata, __DIR__ . '/app/src/models');
+$generator->generate($metadata, __DIR__ . '/../src/Entity');
+// add namespace to all files
+$files = glob(__DIR__ . '/../src/Entity/*.{php}', GLOB_BRACE);
+foreach($files as $file) {
+	$src = file_get_contents($file);
+	if (preg_match('#^namespace\s+(.+?);$#sm', $src, $m)) {
+		continue;
+	}
+	$php = preg_replace("/<\?php/", "<?php\nnamespace " . $namespace . ";", $src);
+	file_put_contents($file, $php);
+}
 print '-------------------------------------------' . PHP_EOL;
-print ' Done! Generated models to `app\src\models`' . PHP_EOL;
+print ' Done! Generated entities to `src\Entity`  ' . PHP_EOL;
 print '-------------------------------------------' . PHP_EOL;

@@ -13,9 +13,9 @@
     ],
     "autoload": {
         "psr-4": {
-            "App\\Controller\\": "app/src/controllers",
-            "App\\Model\\": "app/src/models",
-			"App\\Lib\\": "app/src/libs"
+            "App\\Controller\\": "src/Controller",
+            "App\\Entity\\": "src/Entity",
+			"App\\Lib\\": "src/Lib"
         }
     },
     "require": {
