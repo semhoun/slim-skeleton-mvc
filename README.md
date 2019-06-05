@@ -13,7 +13,7 @@ Base on agustim/slim3-skeleton-mvc-sqlite
    composer create-project -n -s dev semhoun/slim3-skeleton-mvc your-app
    ```
 2. Copy the settings file `cp config/settings.php.dist config/settings.php`
-3. Create database: `cat sql/blog.sql | sqlite3 var/blog.sqlite`
+3. Create database: `php cli.php app:init-db`
 4. Generate Doctrine entities: `php bin/entities_generator.php`
 :warning: *Delete all entities before re-generate to update entities.*
 
@@ -37,12 +37,12 @@ Default login/password is *admin*/*admin*
 * `src/Controller`: All Controller files
 * `src/Entity`: Doctrine entities
 * `src/Lib`: Authentication libraries
+* `src/Command`: CLI commands
 * `templates`: Twig template files
 * `var/cache/twig`: Twig's Autocreated cache files
 * `var/log`: Log files
 * `public`: Webserver root
 * `vendor`: Composer dependencies
-* `sql`: sql dump file for sample database
 
 ## Key files
 
@@ -54,3 +54,4 @@ Default login/password is *admin*/*admin*
 * `src/Controller/HomeController.php`: Controller class for the home page
 * `src/Entity/Post.php`: Entity class for post table
 * `templates/home.twig`: Twig template file for the home page
+* `src/Command/InitDB.php`CLI class to create initial database
