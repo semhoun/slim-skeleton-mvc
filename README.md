@@ -10,7 +10,7 @@ Base on agustim/slim3-skeleton-mvc-sqlite
 
 
    ```bash
-   composer create-project -n -s dev semhoun/slim3-skeleton-mvc your-app
+   composer create-project --repository-url https://gitlab.com/semhoun/slim3-skeleton-mvc/raw/master/packages.json -s dev semhoun/slim3-skeleton-mvc your-app
    ```
 2. Copy the settings file `cp config/settings.php.dist config/settings.php`
 3. Create database: `php cli.php app:init-db`
