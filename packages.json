@@ -1,0 +1,15 @@
+{
+    "packages": {
+        "semhoun/slim3-skeleton-mvc": {
+            "dev-master": {
+                "name": "semhoun/slim3-skeleton-mvc",
+                "source": {
+                    "type": "git",
+                    "url": "https://gitlab.com/semhoun/slim3-skeleton-mvc.git"
+                },
+                "type": "project",
+                "version": "dev-master"
+            }
+        }
+    }
+}
