@@ -4,6 +4,7 @@
             "dev-master": {
                 "name": "semhoun/slim3-skeleton-mvc",
                 "source": {
+					"reference": "master",
                     "type": "git",
                     "url": "https://gitlab.com/semhoun/slim3-skeleton-mvc.git"
                 },
