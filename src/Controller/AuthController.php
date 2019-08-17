@@ -2,40 +2,58 @@
 
 namespace App\Controller;
 
-use Slim\Container;
-use Slim\Http\Request;
-use Slim\Http\Response;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
-class AuthController
+final class AuthController extends BaseController
 {
-    protected $flash;
-    protected $auth;
 
-    public function __construct(Container $c)
+    private function auth(string $uname, string $pswd)
     {
-        $this->flash = $c->get('flash');
-        $this->auth = $c->get('auth');
+        $uinfo = $this->em->getRepository(\App\Entity\User::Class)->findOneByUsername($uname);
+        if ($uinfo == null) return null;
+        if (!password_verify($pswd, $uinfo->getPassword())) return null;
+
+        return $uinfo;
     }
 
-    public function login(Request $request, Response $response, $args)
+    public function login(Request $request, Response $response, array $args = []): Response
     {
-        $uname = $request->getParam('uname');
-        $pswd = $request->getParam('pswd');
+        if ($request->getMethod() == 'POST') {
+            $data = $request->getParsedBody();
 
-        $res = $this->auth->login($response, $uname, $pswd);
-        if ($res == null) {
-            $this->flash->addMessage('error', 'Invalid in login/password');
-            return $response->withStatus(302)->withHeader('Location', '/login');
+            if (empty($data["uname"]) || empty($data["pswd"])) {
+                $this->flash->addMessage('error', 'Empty value in login/password');
+                return $response->withStatus(302)->withHeader('Location', '/member/login');
+            }
+
+            // Check the user username / pass
+            $uinfo = $this->auth($data["uname"], $data['pswd']);
+            if ($uinfo == null) {
+                $this->flash->addMessage('error', 'Invalid login/password');
+                return $response->withStatus(302)->withHeader('Location', '/member/login');
+            }
+
+            $_SESSION['logged'] = 'true';
+            $_SESSION['uinfo'] = [
+                'id' => $uinfo->getId(),
+                'firstname' => $uinfo->getFirstName(),
+                'lastname' => $uinfo->getLastName(),
+                'email' => $uinfo->getEmail()
+            ];
+
+            $this->flash->addMessage('info', 'Logged');
+            return $response->withStatus(302)->withHeader('Location', '/post/1');
         }
-
-        $response = $res;
-        $this->flash->addMessage('info', 'Logged');
-        return $response->withStatus(302)->withHeader('Location', '/member/post/1');
+        else {
+            return $this->view->render($response, 'login.twig', ['flash' => $messages]);
+        }
     }
 
-    public function logout(Request $request, Response $response, $args)
+    public function logout(Request $request, Response $response, array $args = []): Response
     {
-        $response = $this->auth->logout($response);
+        $_SESSION['logged'] = 'false';
+        unset($_SESSION['uinfo']);
         return $response->withStatus(302)->withHeader('Location', '/');
     }
 }

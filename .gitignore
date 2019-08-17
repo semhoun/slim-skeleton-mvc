@@ -1,5 +1,4 @@
 \.ac-php-conf\.json
-config/settings.php
 vendor/
 var/*
 sql/*.sqlite

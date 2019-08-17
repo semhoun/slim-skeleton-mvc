@@ -1,23 +1,20 @@
 <?php
-
 namespace App\Controller;
 
-use Slim\Container;
+use Psr\Container\ContainerInterface;
 
-class BaseController
+abstract class BaseController
 {
     protected $view;
     protected $logger;
     protected $flash;
     protected $em;  // Entities Manager
-    protected $token;
 
-    public function __construct(Container $c)
+    public function __construct(ContainerInterface $c)
     {
         $this->view = $c->get('view');
         $this->logger = $c->get('logger');
         $this->flash = $c->get('flash');
         $this->em = $c->get('em');
-        $this->token = $c->get('token');
     }
 }

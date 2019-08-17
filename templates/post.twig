@@ -1,13 +1,13 @@
 <html>
 	<head>
 		<meta charset="utf-8"/>
-		<title>Slim 3</title>
+		<title>Slim 4</title>
 		<link href='//fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
-		<link href='{{ base_url() }}/css/style.css' rel='stylesheet' type='text/css'>
+		<link href='/css/style.css' rel='stylesheet' type='text/css'>
 	</head>
 	<body>
-		{%if token %}
-			<div style="text-align:right">{{ token.lastname }} {{ token.firstname }}  <a href="/member/logout">Logout</a></div>
+		{%if uinfo %}
+			<div style="text-align:right">{{ uinfo.lastname }} {{ uinfo.firstname }}  <a href="/member/logout">Logout</a></div>
 		{% endif %}
 		<h1>Slim</h1>
 		<div>a microframework for PHP</div>

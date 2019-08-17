@@ -2,11 +2,12 @@
 
 namespace App\Command;
 
+use DI\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Slim\Container;
+
 
 class InitDB extends Command
 {
@@ -46,11 +47,7 @@ class InitDB extends Command
 "CREATE TABLE post (id int primary key not null, title char(100) default null, slug char(200) not null, content text not null);",
 "INSERT INTO post VALUES(1,'First blog post','first-blog-post','This is sample blog post. If you see this content, doctrine is working fine.');",
 "CREATE TABLE user (id int primary key not null, username char(30) not null, password char(60) not null, first_name char(50), last_name char(50), email char(50));",
-"INSERT INTO user VALUES(1,'admin','\$2y\$10\$h2DgpuQvOWhpVmthACoKTuEVQHwHvcg5WjUekdvZx41hukm6LaUzy','Administator', 'THE', 'admin@admin.com');",
-"CREATE TABLE acl (user_id int not null, auth char(30) not null, PRIMARY KEY(user_id, auth),  FOREIGN KEY(user_id) REFERENCES user(id));",
-"INSERT INTO acl VALUES(1, 'read');",
-"INSERT INTO acl VALUES(1, 'write');",
-"INSERT INTO acl VALUES(1, 'delete');"
+"INSERT INTO user VALUES(1,'admin','\$2y\$10\$h2DgpuQvOWhpVmthACoKTuEVQHwHvcg5WjUekdvZx41hukm6LaUzy', 'Administator', 'THE', 'admin@admin.com');",
         ];
 
         foreach($queries as $query) {

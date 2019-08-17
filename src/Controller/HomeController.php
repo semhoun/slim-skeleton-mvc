@@ -1,31 +1,24 @@
 <?php
 namespace App\Controller;
 
-use Slim\Http\Request;
-use Slim\Http\Response;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 final class HomeController extends BaseController
 {
-    public function index(Request $request, Response $response, $args)
+    public function index(Request $request, Response $response, array $args = []): Response
     {
         $this->logger->info("Home page action dispatched");
 
         $this->flash->addMessage('info', 'Sample flash message');
 
-        $this->view->render($response, 'home/index.twig');
+        $this->view->render($response, 'index.twig');
         return $response;
     }
 
-    public function login(Request $request, Response $response, $args)
+    public function viewPost(Request $request, Response $response, array $args = []): Response
     {
-        $messages = $this->flash->getMessage('error');
-        $this->view->render($response, 'home/login.twig', ['flash' => $messages]);
-        return $response;
-    }
-
-    public function viewPost(Request $request, Response $response, $args)
-    {
-        $this->logger->info("View post using Doctrine with Slim 3");
+        $this->logger->info("View post using Doctrine with Slim 4");
 
         $messages = $this->flash->getMessage('info');
 
@@ -36,10 +29,9 @@ final class HomeController extends BaseController
             die;
         }
 
-        $token = null;
-        if ($this->token->logged()) $token = $this->token->data();
+        $uinfo = $request->getAttribute('uinfo');
 
-        $this->view->render($response, 'home/post.twig', ['post' => $post, 'flash' => $messages, 'token' => $token]);
+        $this->view->render($response, 'post.twig', ['post' => $post, 'flash' => $messages, 'uinfo' => $uinfo]);
         return $response;
     }
 }

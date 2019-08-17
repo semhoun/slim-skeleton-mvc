@@ -1,16 +1,20 @@
 <?php
-require __DIR__.'/vendor/autoload.php';
-
+use DI\ContainerBuilder;
 use Symfony\Component\Console\Application;
 
-$settings = require __DIR__ . '/config/settings.php';
-$c = new \Slim\Container($settings);
+require __DIR__.'/vendor/autoload.php';
 
-$app = new \Slim\App($c);
+// Instantiate PHP-DI ContainerBuilder
+$containerBuilder = new ContainerBuilder();
 
-require __DIR__ . '/config/dependencies.php';
+// Set up settings
+$settings = require __DIR__ . '/app/settings.php';
+$settings($containerBuilder);
+
+// Build PHP-DI Container instance
+$container = $containerBuilder->build();
 
 $application = new Application();
-$application->add(new App\Command\InitDB($c));
+$application->add(new App\Command\InitDB($container));
 
 $application->run();

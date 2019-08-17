@@ -1,4 +1,9 @@
 <?php
+declare(strict_types=1);
+
+use DI\ContainerBuilder;
+use Slim\Factory\AppFactory;
+use Slim\Factory\ServerRequestCreatorFactory;
 
 if (PHP_SAPI == 'cli-server') {
     // To help the built-in PHP dev server, check if the request was actually for
@@ -8,32 +13,55 @@ if (PHP_SAPI == 'cli-server') {
         return false;
     }
 }
-
 require __DIR__ . '/../vendor/autoload.php';
 
 session_start();
 
-// Instantiate the app
-$settings = require __DIR__ . '/../config/settings.php';
-$c = new \Slim\Container($settings);
-$c['notFoundHandler'] = function ($c) {
-    return function ($request, $response) use ($c) {
-        return $c->get( 'App\Controller\ErrorController')->E404($request, $response, null);
-    };
-};
-$app = new \Slim\App($c);
+// Instantiate PHP-DI ContainerBuilder
+$containerBuilder = new ContainerBuilder();
 
+// Set up settings
+$settings = require __DIR__ . '/../app/settings.php';
+$settings($containerBuilder);
 // Set up dependencies
-require __DIR__ . '/../config/dependencies.php';
+$dependencies = require __DIR__ . '/../app/dependencies.php';
+$dependencies($containerBuilder);
+
+// Set up factories
+$factories = require __DIR__ . '/../app/factories.php';
+$factories($containerBuilder);
+
+// Build PHP-DI Container instance
+$container = $containerBuilder->build();
+
+$settings = $container->get('settings');
+
+// Instantiate the app
+AppFactory::setContainer($container);
+$app = AppFactory::create();
+$callableResolver = $app->getCallableResolver();
 
 // Register middleware
-require __DIR__ . '/../config/middleware.php';
-
-// Register controller factories
-require __DIR__ . '/../config/controller.php';
+$middleware = require __DIR__ . '/../app/middleware.php';
+$middleware($app);
 
 // Register routes
-require __DIR__ . '/../config/routes.php';
+$routes = require __DIR__ . '/../app/routes.php';
+$routes($app);
 
-// Run!
+// Set the cache file for the routes. Note that you have to delete this file
+// whenever you change the routes.
+if (!$settings['debug']) {
+    $app->getRouteCollector()->setCacheFile($settings['route_cache']);
+}
+
+// Add the routing middleware.
+$app->addRoutingMiddleware();
+
+// Add error handling middleware.
+$errorMiddleware = $app->addErrorMiddleware($settings['debug'], !$settings['debug'], false);
+$errorHandler = $errorMiddleware->getDefaultErrorHandler();
+$errorHandler->registerErrorRenderer('text/html', App\Renderer\HtmlErrorRenderer::class);
+
+// Run the app
 $app->run();

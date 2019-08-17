@@ -1,8 +1,18 @@
-# Slim 3 MVC Skeleton
+# Slim 4 MVC Skeleton
 
-This is a simple skeleton project for Slim 3 that includes Doctrine, Twig, Flash messages, Monolog and JWT token authentication
+This is a simple skeleton project for Slim 4 that includes:
 
-Base on agustim/slim3-skeleton-mvc-sqlite
+- Doctrine
+
+- Twig
+
+- Flash messages
+
+- Monolog
+
+- Console
+
+  
 
 ## Prepare
 
@@ -10,7 +20,7 @@ Base on agustim/slim3-skeleton-mvc-sqlite
 
 
    ```bash
-   composer create-project --repository-url https://gitlab.com/semhoun/slim3-skeleton-mvc/raw/master/packages.json -s dev semhoun/slim3-skeleton-mvc your-app
+   composer create-project --repository-url https://gitlab.com/semhoun/slim3-skeleton-mvc/raw/master/packages.json -n -s dev semhoun/slim3-skeleton-mvc your-app
    ```
 2. Copy the settings file `cp config/settings.php.dist config/settings.php`
 3. Create database: `php cli.php app:init-db`

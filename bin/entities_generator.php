@@ -1,18 +1,44 @@
 <?php
-include __DIR__ . '/../vendor/autoload.php';
-$settings = require __DIR__ . '/../config/settings.php';
+use DI\ContainerBuilder;
+use Symfony\Component\Console\Application;
 
-$classLoader = new \Doctrine\Common\ClassLoader('Entities', __DIR__);
+function rrmdir($src) {
+    $dir = opendir($src);
+    while(false !== ( $file = readdir($dir)) ) {
+        if (( $file != '.' ) && ( $file != '..' )) {
+            $full = $src . '/' . $file;
+            if ( is_dir($full) ) {
+                rrmdir($full);
+            }
+            else {
+                unlink($full);
+            }
+        }
+    }
+    closedir($dir);
+    rmdir($src);
+}
+
+require __DIR__.'/../vendor/autoload.php';
+
+$containerBuilder = new ContainerBuilder();
+$settings = require __DIR__ . '/../app/settings.php';
+$settings($containerBuilder);
+$container = $containerBuilder->build();
+$settings = $container->get('settings');
+
+$classLoader = new \Doctrine\Common\ClassLoader('Entities', $settings['doctrine']['meta']['entity_path'][0]);
 $classLoader->register();
-$classLoader = new \Doctrine\Common\ClassLoader('Proxies', __DIR__);
+$classLoader = new \Doctrine\Common\ClassLoader('Proxies', $settings['doctrine']['meta']['proxy_dir']);
 $classLoader->register();
+
 // config
 $config = new \Doctrine\ORM\Configuration();
-$config->setMetadataDriverImpl($config->newDefaultAnnotationDriver(__DIR__ . '/../var/tmp_entity'));
+$config->setMetadataDriverImpl($config->newDefaultAnnotationDriver($settings['temporary_path'] . '/tmp_entity'));
 $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache);
-$config->setProxyDir(__DIR__ . '/../var/proxies');
+$config->setProxyDir($settings['doctrine']['meta']['proxy_dir']);
 $config->setProxyNamespace('Proxies');
-$em = \Doctrine\ORM\EntityManager::create($settings['settings']['doctrine']['connection'], $config);
+$em = \Doctrine\ORM\EntityManager::create($settings['doctrine']['connection'], $config);
 // custom datatypes (not mapped for reverse engineering)
 $em->getConnection()->getDatabasePlatform()->registerDoctrineTypeMapping('set', 'string');
 $em->getConnection()->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
@@ -30,9 +56,10 @@ $generator = new Doctrine\ORM\Tools\EntityGenerator();
 $generator->setUpdateEntityIfExists(true);
 $generator->setGenerateStubMethods(true);
 $generator->setGenerateAnnotations(true);
-$generator->generate($metadata, __DIR__ . '/../var/tmp_entity');
+$generator->generate($metadata, $settings['temporary_path'] . '/tmp_entity');
+
 // Move files in the good directory
-$files = glob(__DIR__ . '/../var/tmp_entity/App/Entity/*.{php}', GLOB_BRACE);
+$files = glob($settings['temporary_path'] . '/tmp_entity/App/Entity/*.{php}', GLOB_BRACE);
 foreach($files as $fullpath) {
     $file = basename($fullpath);
     $src = file_get_contents($fullpath);
@@ -42,7 +69,8 @@ foreach($files as $fullpath) {
 	$php = preg_replace("/<\?php/", "<?php\nnamespace App\\Entity;", $src);
 	file_put_contents(__DIR__ . '/../src/Entity/' . $file, $php);
 }
+
+rrmdir($settings['temporary_path'] . '/tmp_entity');
 print '-------------------------------------------' . PHP_EOL;
 print ' Done! Generated entities to `src/Entity`  ' . PHP_EOL;
-print '        Please remove var/tmp_entity       ' . PHP_EOL;
 print '-------------------------------------------' . PHP_EOL;
