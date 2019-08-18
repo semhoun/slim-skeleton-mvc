@@ -1,18 +1,21 @@
 # Slim 4 MVC Skeleton
 
-This is a simple skeleton project for Slim 4 that includes:
+This is a simple web application skeleton project that uses the [Slim4 Framework](http://www.slimframework.com/):
 
-- Doctrine
-
-- Twig
-
-- Flash messages
-
-- Monolog
-
+- [PHP-DI](http://php-di.org/) as dependency injection container
+- [Sim-Psr7](https://github.com/slimphp/Slim-Psr7) as PSR-7 implementation
+- [Doctrine](https://github.com/doctrine/orm) as ORM
+- [Twig](https://twig.symfony.com/) as template engine
+- [Flash messages](https://github.com/slimphp/Slim-Flash)
+- [Monolog](https://github.com/Seldaek/monolog)
 - Console
 
-  
+## CAUTION
+
+**The Slim Twig-View is still in active development and can introduce breaking changes. It is 
+an alpha release. Of course you can use this skeleton, but be warned. As soon as
+you update the Slim Twig-View, you might have to modify your code.**
+
 
 ## Prepare
 
@@ -20,7 +23,7 @@ This is a simple skeleton project for Slim 4 that includes:
 
 
    ```bash
-   composer create-project --repository-url https://gitlab.com/semhoun/slim3-skeleton-mvc/raw/master/packages.json -n -s dev semhoun/slim3-skeleton-mvc your-app
+   composer create-project --repository-url https://gitlab.com/semhoun/slim-skeleton-mvc/raw/master/packages.json -n -s dev semhoun/slim-skeleton-mvc [your-app]
    ```
 2. Copy the settings file `cp config/settings.php.dist config/settings.php`
 3. Create database: `php cli.php app:init-db`
@@ -29,7 +32,7 @@ This is a simple skeleton project for Slim 4 that includes:
 
 ## Run it:
 
-1. `cd your-app`
+1. `cd [your-app]`
 2. `php -S 0.0.0.0:8888 -t public/`
 3. Browse to http://localhost:8888
 
@@ -38,30 +41,3 @@ This is a simple skeleton project for Slim 4 that includes:
 Set `var`folder permission to writable when deploy to production environment
 
 Default login/password is *admin*/*admin*
-
-## Key directories
-
-* `bin`:Application tools
-* `config`: Application middleware and general settings
-* `src`: Application code
-* `src/Controller`: All Controller files
-* `src/Entity`: Doctrine entities
-* `src/Lib`: Authentication libraries
-* `src/Command`: CLI commands
-* `templates`: Twig template files
-* `var/cache/twig`: Twig's Autocreated cache files
-* `var/log`: Log files
-* `public`: Webserver root
-* `vendor`: Composer dependencies
-
-## Key files
-
-* `public/index.php`: Entry point  to application and bootstrap
-* `config/settings.php`: Configuration
-* `config/dependencies.php`: Services for Pimple
-* `config/middleware.php`: Application middleware
-* `config/routes.php`: All application routes are here
-* `src/Controller/HomeController.php`: Controller class for the home page
-* `src/Entity/Post.php`: Entity class for post table
-* `templates/home.twig`: Twig template file for the home page
-* `src/Command/InitDB.php`CLI class to create initial database
