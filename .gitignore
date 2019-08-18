@@ -3,4 +3,3 @@ vendor/
 var/*
 sql/*.sqlite
 composer.lock
-src/Entity/*

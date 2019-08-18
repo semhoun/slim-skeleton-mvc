@@ -25,10 +25,8 @@ you update the Slim Twig-View, you might have to modify your code.**
    ```bash
    composer create-project -s dev semhoun/slim-skeleton-mvc [your-app]
    ```
-2. Copy the settings file `cp config/settings.php.dist config/settings.php`
-3. Create database: `php cli.php app:init-db`
-4. Generate Doctrine entities: `php bin/entities_generator.php`
-:warning: *Delete all entities before re-generate to update entities.*
+2. Create database: `php cli.php app:init-db`
+
 
 ## Run it:
 
@@ -36,8 +34,10 @@ you update the Slim Twig-View, you might have to modify your code.**
 2. `php -S 0.0.0.0:8888 -t public/`
 3. Browse to http://localhost:8888
 
+
 ### Notice
 
-Set `var`folder permission to writable when deploy to production environment
-
-Default login/password is *admin*/*admin*
+- Set `var`folder permission to writable when deploy to production environment
+- Default login/password is *admin*/*admin*
+- To generate Doctrine entities:`php bin/entities_generator.php`
+  :warning: *Delete all entities before re-generate to update entities.*
