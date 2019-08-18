@@ -23,7 +23,7 @@ you update the Slim Twig-View, you might have to modify your code.**
 
 
    ```bash
-   composer create-project --repository-url https://gitlab.com/semhoun/slim-skeleton-mvc/raw/master/packages.json -n -s dev semhoun/slim-skeleton-mvc [your-app]
+   composer create-project -s dev semhoun/slim-skeleton-mvc [your-app]
    ```
 2. Copy the settings file `cp config/settings.php.dist config/settings.php`
 3. Create database: `php cli.php app:init-db`

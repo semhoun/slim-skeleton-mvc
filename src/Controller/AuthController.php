@@ -23,14 +23,14 @@ final class AuthController extends BaseController
             $data = $request->getParsedBody();
 
             if (empty($data["uname"]) || empty($data["pswd"])) {
-                $this->flash->addMessage('error', 'Empty value in login/password');
+                $this->flash->addMessage('info', 'Empty value in login/password');
                 return $response->withStatus(302)->withHeader('Location', '/member/login');
             }
 
             // Check the user username / pass
             $uinfo = $this->auth($data["uname"], $data['pswd']);
             if ($uinfo == null) {
-                $this->flash->addMessage('error', 'Invalid login/password');
+                $this->flash->addMessage('info', 'Invalid login/password');
                 return $response->withStatus(302)->withHeader('Location', '/member/login');
             }
 
@@ -43,10 +43,10 @@ final class AuthController extends BaseController
             ];
 
             $this->flash->addMessage('info', 'Logged');
-            return $response->withStatus(302)->withHeader('Location', '/post/1');
+            return $response->withStatus(302)->withHeader('Location', '/');
         }
         else {
-            return $this->view->render($response, 'login.twig', ['flash' => $messages]);
+            return $this->view->render($response, 'login.twig', ['flash' => $this->flash->getMessage('info') , 'uinfo' => $request->getAttribute('uinfo')]);
         }
     }
 

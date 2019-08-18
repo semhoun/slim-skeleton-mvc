@@ -13,22 +13,29 @@ if (PHP_SAPI == 'cli-server') {
         return false;
     }
 }
-require __DIR__ . '/../vendor/autoload.php';
 
+// Set the absolute path to the root directory.
+$rootPath = realpath(__DIR__ . '/..');
+
+// Include the composer autoloader.
+include_once($rootPath . '/vendor/autoload.php');
+
+// Needed by Flash and SessionMiddleware
 session_start();
 
 // Instantiate PHP-DI ContainerBuilder
 $containerBuilder = new ContainerBuilder();
 
 // Set up settings
-$settings = require __DIR__ . '/../app/settings.php';
+$settings = require $rootPath . '/app/settings.php';
 $settings($containerBuilder);
+
 // Set up dependencies
-$dependencies = require __DIR__ . '/../app/dependencies.php';
+$dependencies = require $rootPath . '/app/dependencies.php';
 $dependencies($containerBuilder);
 
 // Set up factories
-$factories = require __DIR__ . '/../app/factories.php';
+$factories = require $rootPath . '/app/factories.php';
 $factories($containerBuilder);
 
 // Build PHP-DI Container instance
@@ -42,11 +49,11 @@ $app = AppFactory::create();
 $callableResolver = $app->getCallableResolver();
 
 // Register middleware
-$middleware = require __DIR__ . '/../app/middleware.php';
+$middleware = require $rootPath . '/app/middleware.php';
 $middleware($app);
 
 // Register routes
-$routes = require __DIR__ . '/../app/routes.php';
+$routes = require $rootPath . '/app/routes.php';
 $routes($app);
 
 // Set the cache file for the routes. Note that you have to delete this file

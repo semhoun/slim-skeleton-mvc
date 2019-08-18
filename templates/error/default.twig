@@ -1,26 +1,18 @@
-<html>
-<head>
-    <meta charset="utf-8"/>
-    <title>Slim 4</title>
-    <link href='//fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
-    <link href='/css/style.css' rel='stylesheet' type='text/css'>
-</head>
-<body>
-	<h1>Slim</h1>
+{% extends 'error/layout.twig' %}
+
+{% block contents %}
+	<h1>Slim4 Error</h1>
+	<h2>{{ title }}</h2>
 	{% if debug %}
-		<h2>{{ code }} - {{ message }}</h2>
 		<h3>Details</h3>
 		<ul>
-			<li><b>Type:</b>{{ type }}</li>
-			<li><b>Code:</b>{{ code }}</li>
-			<li><b>Message:</b>{{ message }}</li>
-			<li><b>File:</b>{{ file }}</li>
-			<li><b>Line:</b>{{ line }}</li>
+			<li><b>Type: </b>{{ type }}</li>
+			<li><b>Code: </b>{{ code }}</li>
+			<li><b>Message: </b>{{ message }}</li>
+			<li><b>File: </b>{{ file }}</li>
+			<li><b>Line: </b>{{ line }}</li>
 		</ul>
 		<h3>Trace</h3>
-			{{ trace|nl2br }}
-	{% else %}
-		<h2>{{ code }} - {{ message }}</h2>
+		{{ trace|nl2br }}
 	{% endif %}
-</body>
-</html>
+{% endblock %}

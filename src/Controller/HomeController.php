@@ -10,10 +10,7 @@ final class HomeController extends BaseController
     {
         $this->logger->info("Home page action dispatched");
 
-        $this->flash->addMessage('info', 'Sample flash message');
-
-        $this->view->render($response, 'index.twig');
-        return $response;
+        return $this->render($request, $response, 'index.twig');
     }
 
     public function viewPost(Request $request, Response $response, array $args = []): Response
@@ -25,13 +22,9 @@ final class HomeController extends BaseController
         try {
             $post = $this->em->find('App\Entity\Post', intval($args['id']));
         } catch (\Exception $e) {
-            echo $e->getMessage();
-            die;
+            throw new \Slim\Exception\HttpInternalServerErrorException($request, $e->getMessage());
         }
 
-        $uinfo = $request->getAttribute('uinfo');
-
-        $this->view->render($response, 'post.twig', ['post' => $post, 'flash' => $messages, 'uinfo' => $uinfo]);
-        return $response;
+        return $this->render($request, $response, 'post.twig', ['post' => $post]);
     }
 }

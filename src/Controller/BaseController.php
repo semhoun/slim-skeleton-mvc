@@ -2,6 +2,8 @@
 namespace App\Controller;
 
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 abstract class BaseController
 {
@@ -16,5 +18,13 @@ abstract class BaseController
         $this->logger = $c->get('logger');
         $this->flash = $c->get('flash');
         $this->em = $c->get('em');
+    }
+
+    protected function render(Request $request, Response $response, string $template, array $params = []): Response
+    {
+        $params['flash'] = $this->flash->getMessage('info');
+        $params['uinfo'] = $request->getAttribute('uinfo');
+
+        return $this->view->render($response, $template, $params);
     }
 }

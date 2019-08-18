@@ -16,6 +16,7 @@
             "App\\Controller\\": "src/Controller",
             "App\\Entity\\": "src/Entity",
 			"App\\Command\\" : "src/Command",
+			"App\\Middleware\\" : "src/Middleware",
 			"App\\Renderer\\" : "src/Renderer"
         }
     },

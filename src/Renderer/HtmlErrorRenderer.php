@@ -24,10 +24,11 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             return $this->view->fetch('error/404.twig');
         }
         return $this->view->fetch('error/default.twig', [
-            'code' => $exception->getCode(),
-            'message' => $exception->getMessage(),
+            'title' => $exception->getTitle(),
             'debug' => $displayErrorDetails,
             'type' => get_class($exception),
+            'code' => $exception->getCode(),
+            'message' => $exception->getMessage(),
             'file' => $exception->getFile(),
             'line' =>  $exception->getLine(),
             'trace' => $exception->getTraceAsString()

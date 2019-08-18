@@ -1,31 +1,11 @@
-<html>
-	<head>
-		<meta charset="utf-8"/>
-		<title>Slim 4</title>
-		<link href='//fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
-		<link href='/css/style.css' rel='stylesheet' type='text/css'>
-	</head>
-	<body>
-		{%if uinfo %}
-			<div style="text-align:right">{{ uinfo.lastname }} {{ uinfo.firstname }}  <a href="/member/logout">Logout</a></div>
-		{% endif %}
-		<h1>Slim</h1>
-		<div>a microframework for PHP</div>
+{% extends 'layout.twig' %}
 
-		{% if flash %}
-			<div style="margin:30px auto;">
-				{% for f in flash %}
-					<p>{{ f }}</p>
-				{% endfor %}
-			</div>
-		{% endif %}
+{% block contents %}
+	<h1>Slim4 Blog</h1>
 
-		<div style="margin-top: 30px">
-			{% if post %}
-				<h2>{{ post.title }}</h2>
-				<hr>
-				<p>{{ post.content }}</p>
-			{% endif %}
-		</div>
-	</body>
-</html>
+	{% if post %}
+		<h2>{{ post.title }}</h2>
+		<hr>
+		<p>{{ post.content }}</p>
+	{% endif %}
+{% endblock %}

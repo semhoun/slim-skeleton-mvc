@@ -1,14 +1,96 @@
-<html>
-    <head>
-        <meta charset="utf-8"/>
-        <title>Slim 4</title>
-        <link href='//fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
-        <link href='/css/style.css' rel='stylesheet' type='text/css'>
-    </head>
-    <body>
-		<div style="text-align:right"><a href="/post/1">Blog</a> <a href="/member/login">Login</a></div>
-        <h1>Slim</h1>
-        <div>a microframework for PHP</div>
-    </body>
-</html>
+{% extends 'layout.twig' %}
 
+{% block contents %}
+    <h1>
+        Slim 4 Skeleton
+    </h1>
+
+    <p>
+        This is a skeleton for a web application that uses the Slim 4 Framework.
+    </p>
+
+    <h2 class="mt-4">
+        PSR-7 implementation
+    </h2>
+
+    <p>
+        By default this project uses the Slim-PSR-7 implementation. But you are
+        free to use any other PSR-7 implementation. Just modify the <code>composer.json</code>
+        file.
+    </p>
+
+    <h2 class="mt-4">
+        Dependency injection
+    </h2>
+
+    <p>
+        By default this project uses the PHP-DI package to build a <code>Container</code>
+        for dependency injection.
+    </p>
+
+    <h2 class="mt-4">
+        Slim Twig extension
+    </h2>
+
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <thead>
+				<tr>
+					<th scope="col">Code</th>
+					<th scope="col">Result</th>
+				</tr>
+            </thead>
+            <tbody>
+				<tr>
+					<td>
+						<code>url_for('post', {'id': '1'})</code>
+					</td>
+					<td>
+						{{ url_for('post', {'id': '1'}) }}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<code>full_url_for('home')</code>
+					</td>
+					<td>
+						{{ full_url_for('home') }}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<code>is_current_url('home')</code>
+					</td>
+					<td>
+						{{ is_current_url('home') ? 'TRUE' : 'FALSE' }}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<code>current_url()</code>
+					</td>
+					<td>
+						{{ current_url() }}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<code>get_uri().scheme</code>
+					</td>
+					<td>
+						{{ get_uri().scheme }}
+					</td>
+				</tr>
+            </tbody>
+        </table>
+    </div>
+
+	<h2 class="mt-4">
+        ORM
+    </h2>
+
+    <p>
+        By default this project uses dotrine ORM.
+    </p>
+
+{% endblock %}

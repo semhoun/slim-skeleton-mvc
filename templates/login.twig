@@ -1,34 +1,19 @@
-<html>
-	<head>
-		<meta charset="utf-8"/>
-		<title>Slim 4</title>
-		<link href='//fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
-		<link href='/css/style.css' rel='stylesheet' type='text/css'>
-	</head>
-	<body>
-		<h1>Slim</h1>
+{% extends 'layout.twig' %}
 
-		{% if flash %}
-			<div style="margin:30px auto;color:red">
-				{% for f in flash %}
-					<p>{{ f }}</p>
-				{% endfor %}
-			</div>
-		{% endif %}
+{% block contents %}
+    <h1>
+        Login
+    </h1>
 
-
-		<h2>Login</h2>
-
-		<div class="login">
-			<form action="/member/login" method="post">
-				<label for="uname"><b>Username</b></label>
-				<input type="text" placeholder="Enter Username" name="uname" required>
-
-				<label for="pswd"><b>Password</b></label>
-				<input type="password" placeholder="Enter Password" name="pswd" required>
-
-				<button type="submit">Login</button>
-			</form>
+	<form action="{{ url_for('login') }}" method="post">
+		<div class="form-group">
+			<label for="exampleInputUsername">Username</label>
+			<input type="text" name="uname" class="form-control" id="exampleInputUsername" placeholder="Enter username">
 		</div>
-	</body>
-</html>
+		<div class="form-group">
+			<label for="exampleInputPassword">Password</label>
+			<input type="password" name="pswd" class="form-control" id="exampleInputPassword" placeholder="Password">
+		</div>
+		<button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+{% endblock %}
