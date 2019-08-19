@@ -17,8 +17,6 @@ final class HomeController extends BaseController
     {
         $this->logger->info("View post using Doctrine with Slim 4");
 
-        $messages = $this->flash->getMessage('info');
-
         try {
             $post = $this->em->find('App\Entity\Post', intval($args['id']));
         } catch (\Exception $e) {

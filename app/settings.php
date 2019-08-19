@@ -46,7 +46,7 @@ return function (ContainerBuilder $containerBuilder) {
 			// monolog settings
 			'logger' => [
 				'name' => 'app',
-				'path' =>  isset($_ENV['docker']) ? 'php://stdout' :$rootPath . '/var/log/app.log',
+				'path' =>  getenv(['docker']) ? 'php://stdout' :$rootPath . '/var/log/app.log',
 				'level' => (getenv('APPLICATION_ENV') != 'production') ? Logger::DEBUG : Logger::INFO,
 			]
 		],

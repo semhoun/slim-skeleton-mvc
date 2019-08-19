@@ -71,6 +71,6 @@ foreach($files as $fullpath) {
 }
 
 rrmdir($settings['temporary_path'] . '/tmp_entity');
-print '-------------------------------------------' . PHP_EOL;
-print ' Done! Generated entities to `src/Entity`  ' . PHP_EOL;
-print '-------------------------------------------' . PHP_EOL;
+echo '-------------------------------------------' . PHP_EOL;
+echo ' Done! Generated entities to `src/Entity`  ' . PHP_EOL;
+echo '-------------------------------------------' . PHP_EOL;
