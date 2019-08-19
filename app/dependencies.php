@@ -11,8 +11,8 @@ use Doctrine\ORM\EntityManager;
 
 return function (ContainerBuilder $containerBuilder) {
     $containerBuilder->addDefinitions([
-        'logger' => function (ContainerInterface $c) {
-            $settings = $c->get('settings');
+        'logger' => function (ContainerInterface $container) {
+            $settings = $container->get('settings');
 
             $loggerSettings = $settings['logger'];
             $logger = new Logger($loggerSettings['name']);
@@ -25,8 +25,8 @@ return function (ContainerBuilder $containerBuilder) {
 
             return $logger;
         },
-        'em' => function (ContainerInterface $c) {
-            $settings = $c->get('settings');
+        'em' => function (ContainerInterface $container) {
+            $settings = $container->get('settings');
             $config = \Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration(
                 $settings['doctrine']['meta']['entity_path'],
                 $settings['doctrine']['meta']['auto_generate_proxies'],
@@ -36,8 +36,12 @@ return function (ContainerBuilder $containerBuilder) {
             );
             return EntityManager::create($settings['doctrine']['connection'], $config);
         },
-        'flash' => function (ContainerInterface $c) {
-            return new \Slim\Flash\Messages;
+        'session' => function (ContainerInterface $container) {
+            return new \App\Middleware\SessionMiddleware;
+        },
+        'flash' => function (ContainerInterface $container) {
+            $session =& $container->get('session')->getStorage();
+            return new \Slim\Flash\Messages($session);
         }
     ]);
 };

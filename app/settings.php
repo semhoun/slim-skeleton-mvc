@@ -6,7 +6,7 @@ use Monolog\Logger;
 
 return function (ContainerBuilder $containerBuilder) {
 	$rootPath = realpath(__DIR__ . '/..');
-	
+
     // Global Settings Object
     $containerBuilder->addDefinitions([
 		'settings' => [
@@ -46,7 +46,7 @@ return function (ContainerBuilder $containerBuilder) {
 			// monolog settings
 			'logger' => [
 				'name' => 'app',
-				'path' =>  getenv(['docker']) ? 'php://stdout' :$rootPath . '/var/log/app.log',
+				'path' =>  getenv('docker') ? 'php://stdout' : $rootPath . '/var/log/app.log',
 				'level' => (getenv('APPLICATION_ENV') != 'production') ? Logger::DEBUG : Logger::INFO,
 			]
 		],

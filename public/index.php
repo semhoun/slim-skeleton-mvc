@@ -11,9 +11,6 @@ $rootPath = realpath(__DIR__ . '/..');
 // Include the composer autoloader.
 include_once($rootPath . '/vendor/autoload.php');
 
-// Needed by Flash and SessionMiddleware
-session_start();
-
 // Instantiate PHP-DI ContainerBuilder
 $containerBuilder = new ContainerBuilder();
 

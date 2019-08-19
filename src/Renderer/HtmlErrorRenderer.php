@@ -9,9 +9,9 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 {
     protected $view;
 
-    public function __construct(ContainerInterface $c)
+    public function __construct(ContainerInterface $container)
     {
-        $settings = $c->get('settings');
+        $settings = $container->get('settings');
         $this->view = new Twig(
             $settings['view']['template_path'],
             $settings['view']['twig']
@@ -23,8 +23,14 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         if ($exception->getCode() == 404) {
             return $this->view->fetch('error/404.twig');
         }
+
+		$title = '500 - ' .  get_class($exception);
+		if (is_a($exception, '\Slim\Exception\HttpException')) {
+			$tile = $exception->getTitle();
+		}
+
         return $this->view->fetch('error/default.twig', [
-            'title' => $exception->getTitle(),
+            'title' => $title,
             'debug' => $displayErrorDetails,
             'type' => get_class($exception),
             'code' => $exception->getCode(),

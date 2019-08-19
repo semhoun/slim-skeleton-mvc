@@ -13,7 +13,7 @@ return function(App $app) {
     $container = $app->getContainer();
     $settings = $container->get('settings');
 
-    $app->add(SessionMiddleware::class);
+    $app->add($container->get('session'));
 
     $app->add(
         new TwigMiddleware(

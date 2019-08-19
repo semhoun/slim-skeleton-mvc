@@ -13,10 +13,10 @@ class InitDB extends Command
 {
     private $settings;
 
-    public function __construct(Container $c)
+    public function __construct(Container $container)
     {
         parent::__construct();
-        $this->settings = $c->get('settings');
+        $this->settings = $container->get('settings');
     }
 
     protected function configure()
