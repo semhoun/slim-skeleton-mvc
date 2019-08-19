@@ -36,12 +36,12 @@ class InitDB extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-		$db = new \SQLite3($this->settings['doctrine']['connection']['path']);
+		$dbi = new \SQLite3($this->settings['doctrine']['connection']['path']);
         if (!$db) {
             $output->writeLn('Can\'t open sqlite3 database [' . $this->settings['doctrine']['connection']['path'] . ']');
             return;
         }
-        $db->exec('BEGIN TRANSACTION;');
+        $dbi->exec('BEGIN TRANSACTION;');
 
         $queries = [
 "CREATE TABLE post (id int primary key not null, title char(100) default null, slug char(200) not null, content text not null);",
@@ -51,16 +51,16 @@ class InitDB extends Command
         ];
 
         foreach($queries as $query) {
-            if (!$db->exec($query)) {
-                $output->writeLn('Can\'t execute SQL query "' . $query . '": ' . $db->lastErrorMsg());
-                $db->exec('ROLLBACK;');
+            if (!$dbi->exec($query)) {
+                $output->writeLn('Can\'t execute SQL query "' . $query . '": ' . $dbi->lastErrorMsg());
+                $dbi->exec('ROLLBACK;');
                 return;
             }
         }
 
-		$db->exec('COMMIT;');
+		$dbi->exec('COMMIT;');
 
         $output->writeLn("Database structure created");
-        $db->close();
+        $dbi->close();
     }
 }

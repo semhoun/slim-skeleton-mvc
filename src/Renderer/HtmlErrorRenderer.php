@@ -26,7 +26,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
 		$title = '500 - ' .  get_class($exception);
 		if (is_a($exception, '\Slim\Exception\HttpException')) {
-			$tile = $exception->getTitle();
+			$title = $exception->getTitle();
 		}
 
         return $this->view->fetch('error/default.twig', [
