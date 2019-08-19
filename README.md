@@ -1,5 +1,7 @@
 # Slim 4 MVC Skeleton
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2154b570bb974bb1ae6d4d40bcd75fd4)](https://app.codacy.com/app/semhoun/slim-skeleton-mvc?utm_source=github.com&utm_medium=referral&utm_content=semhoun/slim-skeleton-mvc&utm_campaign=Badge_Grade_Dashboard)
+
 This is a simple web application skeleton project that uses the [Slim4 Framework](http://www.slimframework.com/):
 
 - [PHP-DI](http://php-di.org/) as dependency injection container
