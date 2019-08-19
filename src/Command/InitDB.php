@@ -37,7 +37,7 @@ class InitDB extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 		$dbi = new \SQLite3($this->settings['doctrine']['connection']['path']);
-        if (!$db) {
+        if (!$dbi) {
             $output->writeLn('Can\'t open sqlite3 database [' . $this->settings['doctrine']['connection']['path'] . ']');
             return;
         }
