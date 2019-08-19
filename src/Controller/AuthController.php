@@ -34,8 +34,9 @@ final class AuthController extends BaseController
                 return $response->withStatus(302)->withHeader('Location', '/member/login');
             }
 
-            $_SESSION['logged'] = 'true';
-            $_SESSION['uinfo'] = [
+            $session = $request->getAttribute('session');
+            $session['logged'] = true;
+            $session['uinfo'] = [
                 'id' => $uinfo->getId(),
                 'firstname' => $uinfo->getFirstName(),
                 'lastname' => $uinfo->getLastName(),
@@ -50,8 +51,9 @@ final class AuthController extends BaseController
 
     public function logout(Request $request, Response $response, array $args = []): Response
     {
-        $_SESSION['logged'] = 'false';
-        unset($_SESSION['uinfo']);
+        $session = $request->getAttribute('session');
+        $session['logged'] = false;
+        unset($session['uinfo']);
         return $response->withStatus(302)->withHeader('Location', '/');
     }
 }

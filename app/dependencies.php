@@ -40,7 +40,7 @@ return function (ContainerBuilder $containerBuilder) {
             return new \App\Middleware\SessionMiddleware;
         },
         'flash' => function (ContainerInterface $container) {
-            $session =& $container->get('session')->getStorage();
+            $session = $container->get('session');
             return new \Slim\Flash\Messages($session);
         }
     ]);
