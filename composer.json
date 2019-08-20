@@ -15,20 +15,20 @@
         "psr-4": {
             "App\\Controller\\": "src/Controller",
             "App\\Entity\\": "src/Entity",
-			"App\\Command\\" : "src/Command",
-			"App\\Middleware\\" : "src/Middleware",
-			"App\\Renderer\\" : "src/Renderer"
+            "App\\Command\\" : "src/Command",
+            "App\\Middleware\\" : "src/Middleware",
+            "App\\Renderer\\" : "src/Renderer"
         }
     },
     "require": {
-		"php": ">=7.1",
-		"slim/slim": "^4.1.0",
+        "php": ">=7.1",
+        "slim/slim": "^4.1",
         "slim/psr7": "^0.4.0",
         "php-di/php-di": "^6.0",
-		"slim/twig-view": "3.0.0-alpha",
+        "slim/twig-view": "3.0.0-alpha",
         "slim/flash": "^0.4.0",
         "monolog/monolog": "2.0.0-beta2",
         "doctrine/orm": "^2",
-		"symfony/console": "^4.2"
+        "symfony/console": "^4.2"
     }
 }
