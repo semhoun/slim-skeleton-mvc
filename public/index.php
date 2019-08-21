@@ -15,15 +15,15 @@ include_once($rootPath . '/vendor/autoload.php');
 $containerBuilder = new ContainerBuilder();
 
 // Set up settings
-$settings = require $rootPath . '/app/settings.php';
+$settings = require $rootPath . '/conf/settings.php';
 $settings($containerBuilder);
 
 // Set up dependencies
-$dependencies = require $rootPath . '/app/dependencies.php';
+$dependencies = require $rootPath . '/conf/dependencies.php';
 $dependencies($containerBuilder);
 
 // Set up factories
-$factories = require $rootPath . '/app/factories.php';
+$factories = require $rootPath . '/conf/factories.php';
 $factories($containerBuilder);
 
 // Build PHP-DI Container instance
@@ -32,16 +32,14 @@ $container = $containerBuilder->build();
 $settings = $container->get('settings');
 
 // Instantiate the app
-AppFactory::setContainer($container);
-$app = AppFactory::create();
-$callableResolver = $app->getCallableResolver();
+$app = AppFactory::createFromContainer($container);
 
 // Register middleware
-$middleware = require $rootPath . '/app/middleware.php';
+$middleware = require $rootPath . '/conf/middleware.php';
 $middleware($app);
 
 // Register routes
-$routes = require $rootPath . '/app/routes.php';
+$routes = require $rootPath . '/conf/routes.php';
 $routes($app);
 
 // Set the cache file for the routes. Note that you have to delete this file
