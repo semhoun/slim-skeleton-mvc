@@ -22,6 +22,7 @@
     },
     "require": {
         "php": ">=7.1",
+		"ext-sqlite3": "*",
         "slim/slim": "^4.2",
         "slim/psr7": "^0.4.0",
         "php-di/php-di": "^6.0",
