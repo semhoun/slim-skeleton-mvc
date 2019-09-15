@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 use DI\ContainerBuilder;
 use Symfony\Component\Console\Application;
@@ -19,10 +20,13 @@ function rrmdir($src) {
     rmdir($src);
 }
 
-require __DIR__.'/../vendor/autoload.php';
+// Set the absolute path to the root directory.
+$rootPath = realpath(__DIR__ . '/..');
+
+require $rootPath . '/vendor/autoload.php';
 
 $containerBuilder = new ContainerBuilder();
-$settings = require __DIR__ . '/../conf/settings.php';
+$settings = require _$rootPath . '/conf/settings.php';
 $settings($containerBuilder);
 $container = $containerBuilder->build();
 $settings = $container->get('settings');
@@ -67,7 +71,7 @@ foreach($files as $fullpath) {
 		continue;
 	}
 	$php = preg_replace("/<\?php/", "<?php\nnamespace App\\Entity;", $src);
-	file_put_contents(__DIR__ . '/../src/Entity/' . $file, $php);
+	file_put_contents($rootPath . '/src/Entity/' . $file, $php);
 }
 
 rrmdir($settings['temporary_path'] . '/tmp_entity');
