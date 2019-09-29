@@ -26,9 +26,9 @@
         "slim/slim": "^4.2",
         "slim/psr7": "^0.4.0",
         "php-di/php-di": "^6.0",
-        "slim/twig-view": "3.0.0-alpha",
+        "slim/twig-view": "3.x@dev",
         "slim/flash": "^0.4.0",
-        "monolog/monolog": "2.0.0-beta2",
+        "monolog/monolog": "2.0.0",
         "doctrine/orm": "^2",
         "symfony/console": "^4.2"
     }

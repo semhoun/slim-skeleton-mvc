@@ -8,6 +8,7 @@ use Monolog\Processor\UidProcessor;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManager;
+use Slim\Views\Twig;
 
 return function (ContainerBuilder $containerBuilder) {
     $containerBuilder->addDefinitions([
@@ -42,7 +43,11 @@ return function (ContainerBuilder $containerBuilder) {
         'flash' => function (ContainerInterface $container) {
             $session = $container->get('session');
             return new \Slim\Flash\Messages($session);
-        }
+        },
+		'view' => function (ContainerInterface $container) {
+            $settings = $container->get('settings');
+			return Twig::create($settings['view']['template_path'], $settings['view']['twig']);
+        },
     ]);
 };
 

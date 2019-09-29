@@ -12,10 +12,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     public function __construct(ContainerInterface $container)
     {
         $settings = $container->get('settings');
-        $this->view = new Twig(
-            $settings['view']['template_path'],
-            $settings['view']['twig']
-        );
+        $this->view = Twig::create($settings['view']['template_path'], $settings['view']['twig']);
     }
 
     public function __invoke(\Throwable $exception, bool $displayErrorDetails): string
