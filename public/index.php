@@ -22,10 +22,6 @@ $settings($containerBuilder);
 $dependencies = require $rootPath . '/conf/dependencies.php';
 $dependencies($containerBuilder);
 
-// Set up factories
-$factories = require $rootPath . '/conf/factories.php';
-$factories($containerBuilder);
-
 // Build PHP-DI Container instance
 $container = $containerBuilder->build();
 
