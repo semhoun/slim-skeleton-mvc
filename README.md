@@ -14,7 +14,7 @@ This is a simple web application skeleton project that uses the [Slim4 Framework
 ## CAUTION
 
 **The Slim Twig-View is still in active development and can introduce breaking changes. It is 
-an alpha release. Of course you can use this skeleton, but be warned. As soon as
+an beta release. Of course you can use this skeleton, but be warned. As soon as
 you update the Slim Twig-View, you might have to modify your code.**
 
 
@@ -24,7 +24,7 @@ you update the Slim Twig-View, you might have to modify your code.**
 
 
    ```bash
-   composer create-project -s dev semhoun/slim-skeleton-mvc [your-app]
+   composer create-project semhoun/slim-skeleton-mvc [your-app]
    ```
 2. Create database: `./bin/console.php app:init-db`
 
