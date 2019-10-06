@@ -29,6 +29,7 @@ $settings = $container->get('settings');
 
 // Instantiate the app
 $app = AppFactory::createFromContainer($container);
+$app->setBasePath($settings['base_path']);
 
 // Register middleware
 $middleware = require $rootPath . '/conf/middleware.php';

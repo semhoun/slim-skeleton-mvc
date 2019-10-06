@@ -10,6 +10,9 @@ return function (ContainerBuilder $containerBuilder) {
     // Global Settings Object
     $containerBuilder->addDefinitions([
 		'settings' => [
+			// Base path
+			'base_path' => '',
+		
             // Is debug mode
             'debug' => (getenv('APPLICATION_ENV') != 'production'),
 
