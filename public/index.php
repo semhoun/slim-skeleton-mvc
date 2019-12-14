@@ -42,7 +42,7 @@ $routes($app);
 // Set the cache file for the routes. Note that you have to delete this file
 // whenever you change the routes.
 if (!$settings['debug']) {
-    $app->getRouteCollector()->setCacheFile($settings['route_cache']);
+	$app->getRouteCollector()->setCacheFile($settings['route_cache']);
 }
 
 // Add the routing middleware.
