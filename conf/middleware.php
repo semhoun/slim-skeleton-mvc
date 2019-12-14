@@ -8,10 +8,10 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\TwigMiddleware;
 
 return function(App $app) {
-    $container = $app->getContainer();
-    $settings = $container->get('settings');
+	$container = $app->getContainer();
+	$settings = $container->get('settings');
 
-    $app->add($container->get('session'));
+	$app->add($container->get('session'));
 
 	$app->add(TwigMiddleware::createFromContainer($app));
 };

@@ -1,5 +1,4 @@
 \.ac-php-conf\.json
 vendor/
 var/*
-sql/*.sqlite
 composer.lock
