@@ -23,10 +23,10 @@
     "require": {
         "php": ">=7.1",
 		"ext-sqlite3": "*",
-        "slim/slim": "^4.2",
-        "slim/psr7": "^0.4.0",
+		"slim/slim": "^4.4",
+        "slim/psr7": "^1.0",
         "php-di/php-di": "^6.0",
-        "slim/twig-view": "3.x@dev",
+		"slim/twig-view": "^3.0",
         "slim/flash": "^0.4.0",
         "monolog/monolog": "2.0.0",
         "doctrine/orm": "^2",
