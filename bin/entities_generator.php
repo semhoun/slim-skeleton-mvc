@@ -4,20 +4,20 @@ use DI\ContainerBuilder;
 use Symfony\Component\Console\Application;
 
 function rrmdir($src) {
-	$dir = opendir($src);
-	while(false !== ( $file = readdir($dir)) ) {
-		if (( $file != '.' ) && ( $file != '..' )) {
-			$full = $src . '/' . $file;
-			if ( is_dir($full) ) {
-				rrmdir($full);
-			}
-			else {
-				unlink($full);
-			}
-		}
-	}
-	closedir($dir);
-	rmdir($src);
+    $dir = opendir($src);
+    while(false !== ( $file = readdir($dir)) ) {
+        if (( $file != '.' ) && ( $file != '..' )) {
+            $full = $src . '/' . $file;
+            if ( is_dir($full) ) {
+                rrmdir($full);
+            }
+            else {
+                unlink($full);
+            }
+        }
+    }
+    closedir($dir);
+    rmdir($src);
 }
 
 // Set the absolute path to the root directory.
@@ -48,7 +48,7 @@ $em->getConnection()->getDatabasePlatform()->registerDoctrineTypeMapping('set', 
 $em->getConnection()->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 // fetch metadata
 $driver = new \Doctrine\ORM\Mapping\Driver\DatabaseDriver(
-	$em->getConnection()->getSchemaManager()
+    $em->getConnection()->getSchemaManager()
 );
 $driver->setNamespace('\\App\\Entity\\');
 $em->getConfiguration()->setMetadataDriverImpl($driver);
@@ -65,13 +65,13 @@ $generator->generate($metadata, $settings['temporary_path'] . '/tmp_entity');
 // Move files in the good directory
 $files = glob($settings['temporary_path'] . '/tmp_entity/App/Entity/*.{php}', GLOB_BRACE);
 foreach($files as $fullpath) {
-	$file = basename($fullpath);
-	$src = file_get_contents($fullpath);
-	if (preg_match('#^namespace\s+(.+?);$#sm', $src)) {
-		continue;
-	}
-	$php = preg_replace("/<\?php/", "<?php\nnamespace App\\Entity;", $src);
-	file_put_contents($rootPath . '/src/Entity/' . $file, $php);
+    $file = basename($fullpath);
+    $src = file_get_contents($fullpath);
+    if (preg_match('#^namespace\s+(.+?);$#sm', $src)) {
+        continue;
+    }
+    $php = preg_replace("/<\?php/", "<?php\nnamespace App\\Entity;", $src);
+    file_put_contents($rootPath . '/src/Entity/' . $file, $php);
 }
 
 rrmdir($settings['temporary_path'] . '/tmp_entity');

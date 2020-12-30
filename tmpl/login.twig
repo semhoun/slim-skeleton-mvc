@@ -1,19 +1,19 @@
 {% extends 'layout.twig' %}
 
 {% block contents %}
-	<h1>
-		Login
-	</h1>
+    <h1>
+        Login
+    </h1>
 
-	<form action="{{ url_for('login') }}" method="post">
-		<div class="form-group">
-			<label for="exampleInputUsername">Username</label>
-			<input type="text" name="uname" class="form-control" id="exampleInputUsername" placeholder="Enter username">
-		</div>
-		<div class="form-group">
-			<label for="exampleInputPassword">Password</label>
-			<input type="password" name="pswd" class="form-control" id="exampleInputPassword" placeholder="Password">
-		</div>
-		<button type="submit" class="btn btn-primary">Submit</button>
-	</form>
+    <form action="{{ url_for('login') }}" method="post">
+        <div class="form-group">
+            <label for="exampleInputUsername">Username</label>
+            <input type="text" name="uname" class="form-control" id="exampleInputUsername" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword">Password</label>
+            <input type="password" name="pswd" class="form-control" id="exampleInputPassword" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 {% endblock %}

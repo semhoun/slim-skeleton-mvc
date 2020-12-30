@@ -1,18 +1,18 @@
 {% extends 'error/layout.twig' %}
 
 {% block contents %}
-	<h1>Slim4 Error</h1>
-	<h2>{{ title }}</h2>
-	{% if debug %}
-		<h3>Details</h3>
-		<ul>
-			<li><b>Type: </b>{{ type }}</li>
-			<li><b>Code: </b>{{ code }}</li>
-			<li><b>Message: </b>{{ message }}</li>
-			<li><b>File: </b>{{ file }}</li>
-			<li><b>Line: </b>{{ line }}</li>
-		</ul>
-		<h3>Trace</h3>
-		{{ trace|nl2br }}
-	{% endif %}
+    <h1>Slim4 Error</h1>
+    <h2>{{ title }}</h2>
+    {% if debug %}
+        <h3>Details</h3>
+        <ul>
+            <li><b>Type: </b>{{ type }}</li>
+            <li><b>Code: </b>{{ code }}</li>
+            <li><b>Message: </b>{{ message }}</li>
+            <li><b>File: </b>{{ file }}</li>
+            <li><b>Line: </b>{{ line }}</li>
+        </ul>
+        <h3>Trace</h3>
+        {{ trace|nl2br }}
+    {% endif %}
 {% endblock %}
