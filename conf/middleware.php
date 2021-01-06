@@ -14,4 +14,6 @@ return function(App $app) {
     $app->add($container->get('session'));
 
     $app->add(TwigMiddleware::createFromContainer($app));
+    
+    $app->add(new \RKA\Middleware\ProxyDetection());
 };
