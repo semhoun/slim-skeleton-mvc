@@ -26,7 +26,7 @@ $rootPath = realpath(__DIR__ . '/..');
 require $rootPath . '/vendor/autoload.php';
 
 $containerBuilder = new ContainerBuilder();
-$settings = require _$rootPath . '/conf/settings.php';
+$settings = include $rootPath . '/conf/settings.php';
 $settings($containerBuilder);
 $container = $containerBuilder->build();
 $settings = $container->get('settings');
