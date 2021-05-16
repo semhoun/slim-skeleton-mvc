@@ -11,12 +11,6 @@ This is a simple web application skeleton project that uses the [Slim4 Framework
 * [Monolog](https://github.com/Seldaek/monolog)
 * [Console](https://github.com/symfony/console)
 
-## CAUTION
-
-**The Slim Twig-View is still in active development and can introduce breaking changes. It is 
-an beta release. Of course you can use this skeleton, but be warned. As soon as
-you update the Slim Twig-View, you might have to modify your code.**
-
 
 ## Prepare
 
