@@ -37,7 +37,6 @@ return function (ContainerBuilder $containerBuilder) {
                 'dev_mode' => (getenv('APPLICATION_ENV') != 'production'),
                 'meta' => [
                     'entity_path' => [ $rootPath . '/src/Entity' ],
-                    'auto_generate_proxies' => true,
                     'proxy_dir' => $rootPath . '/var/cache/proxies',
                     'cache' => null,
                 ],
