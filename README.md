@@ -34,5 +34,5 @@ This is a simple web application skeleton project that uses the [Slim4 Framework
 
 - Set `var` folder permission to writable when deploy to production environment
 - Default login/password is *admin*/*admin*
-- To generate Doctrine entities:`./bin/entities_generator.php`
+- To generate Doctrine entities:`./bin/console.php orm:convert-mapping --from-database annotation ./src/Entity`
   :warning: *Delete all entities before re-generate to update entities.*

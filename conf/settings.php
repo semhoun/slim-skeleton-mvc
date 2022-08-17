@@ -34,6 +34,7 @@ return function (ContainerBuilder $containerBuilder) {
 
             // doctrine settings
             'doctrine' => [
+                'dev_mode' => (getenv('APPLICATION_ENV') != 'production'),
                 'meta' => [
                     'entity_path' => [ $rootPath . '/src/Entity' ],
                     'auto_generate_proxies' => true,

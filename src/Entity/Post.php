@@ -2,11 +2,10 @@
 namespace App\Entity;
 
 
-
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Post
+ *  Post
  *
  * @ORM\Table(name="post")
  * @ORM\Entity
@@ -43,86 +42,39 @@ class Post
      */
     private $content;
 
-
-    /**
-     * Get id.
-     *
-     * @return int
-     */
-    public function getId()
+    /********************
+     * Getter and Setter
+     ********************/
+    public function getId() : int
     {
-        return $this->id;
+      return $this->id;
     }
-
-    /**
-     * Set title.
-     *
-     * @param string|null $title
-     *
-     * @return Post
-     */
-    public function setTitle($title = null)
+    public function setId(int $val)
     {
-        $this->title = $title;
-
-        return $this;
+      $this->id = $val;
     }
-
-    /**
-     * Get title.
-     *
-     * @return string|null
-     */
-    public function getTitle()
+    public function getTitle() : ?string
     {
-        return $this->title;
+      return $this->title;
     }
-
-    /**
-     * Set slug.
-     *
-     * @param string $slug
-     *
-     * @return Post
-     */
-    public function setSlug($slug)
+    public function setTitle(?string $val)
     {
-        $this->slug = $slug;
-
-        return $this;
+      $this->title = $val;
     }
-
-    /**
-     * Get slug.
-     *
-     * @return string
-     */
-    public function getSlug()
+    public function getSlug() : string
     {
-        return $this->slug;
+      return $this->slug;
     }
-
-    /**
-     * Set content.
-     *
-     * @param string $content
-     *
-     * @return Post
-     */
-    public function setContent($content)
+    public function setSlug(string $val)
     {
-        $this->content = $content;
-
-        return $this;
+      $this->slug = $val;
     }
-
-    /**
-     * Get content.
-     *
-     * @return string
-     */
-    public function getContent()
+    public function getContent() : string
     {
-        return $this->content;
+      return $this->content;
+    }
+    public function setContent(string $val)
+    {
+      $this->content = $val;
     }
 }

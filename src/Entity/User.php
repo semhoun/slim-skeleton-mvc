@@ -1,8 +1,6 @@
 <?php
 namespace App\Entity;
 
-
-
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -57,134 +55,55 @@ class User
      */
     private $email;
 
-
-    /**
-     * Get id.
-     *
-     * @return int
-     */
-    public function getId()
+    /********************
+     * Getter and Setter
+     ********************/
+    public function getId() : int
     {
-        return $this->id;
+      return $this->id;
     }
-
-    /**
-     * Set username.
-     *
-     * @param string $username
-     *
-     * @return User
-     */
-    public function setUsername($username)
+    public function setId(int $val)
     {
-        $this->username = $username;
-
-        return $this;
+      $this->id = $val;
     }
-
-    /**
-     * Get username.
-     *
-     * @return string
-     */
-    public function getUsername()
+    public function getUsername() : string
     {
-        return $this->username;
+      return $this->username;
     }
-
-    /**
-     * Set password.
-     *
-     * @param string $password
-     *
-     * @return User
-     */
-    public function setPassword($password)
+    public function setUsername(string $val)
     {
-        $this->password = $password;
-
-        return $this;
+      $this->username = $val;
     }
-
-    /**
-     * Get password.
-     *
-     * @return string
-     */
-    public function getPassword()
+    public function getPassword() : string
     {
-        return $this->password;
+      return $this->password;
     }
-
-    /**
-     * Set firstName.
-     *
-     * @param string|null $firstName
-     *
-     * @return User
-     */
-    public function setFirstName($firstName = null)
+    public function setPassword(string $val)
     {
-        $this->firstName = $firstName;
-
-        return $this;
+      $this->password = $val;
     }
-
-    /**
-     * Get firstName.
-     *
-     * @return string|null
-     */
-    public function getFirstName()
+    public function getFirstName() : ?string
     {
-        return $this->firstName;
+      return $this->firstName;
     }
-
-    /**
-     * Set lastName.
-     *
-     * @param string|null $lastName
-     *
-     * @return User
-     */
-    public function setLastName($lastName = null)
+    public function setFirstName(?string $val)
     {
-        $this->lastName = $lastName;
-
-        return $this;
+      $this->firstName = $val;
     }
-
-    /**
-     * Get lastName.
-     *
-     * @return string|null
-     */
-    public function getLastName()
+    public function getLastName() : ?string
     {
-        return $this->lastName;
+      return $this->lastName;
     }
-
-    /**
-     * Set email.
-     *
-     * @param string|null $email
-     *
-     * @return User
-     */
-    public function setEmail($email = null)
+    public function setLastName(?string $val)
     {
-        $this->email = $email;
-
-        return $this;
+      $this->lastName = $val;
     }
-
-    /**
-     * Get email.
-     *
-     * @return string|null
-     */
-    public function getEmail()
+    public function getEmail() : ?string
     {
-        return $this->email;
+      return $this->email;
+    }
+    public function setEmail(?string $val)
+    {
+      $this->email = $val;
     }
 }

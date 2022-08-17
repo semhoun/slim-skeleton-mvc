@@ -7,6 +7,7 @@ use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\EntityManager;
 use Slim\Views\Twig;
 
@@ -28,13 +29,13 @@ return function (ContainerBuilder $containerBuilder) {
         },
         'em' => function (ContainerInterface $container) {
             $settings = $container->get('settings');
-            $config = \Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration(
-                $settings['doctrine']['meta']['entity_path'],
-                $settings['doctrine']['meta']['auto_generate_proxies'],
-                $settings['doctrine']['meta']['proxy_dir'],
+            $config = ORMSetup::createAnnotationMetadataConfiguration(
+                $settings['doctrine']['meta']['entity_path'], 
+                $settings['doctrine']['dev_mode'], 
+                $settings['doctrine']['meta']['proxy_dir'], 
                 $settings['doctrine']['meta']['cache'],
-                false
-            );
+                false);
+
             return EntityManager::create($settings['doctrine']['connection'], $config);
         },
         'session' => function (ContainerInterface $container) {

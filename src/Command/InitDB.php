@@ -39,7 +39,7 @@ class InitDB extends Command
         $dbi = new \SQLite3($this->settings['doctrine']['connection']['path']);
         if (!$dbi) {
             $output->writeLn('Can\'t open sqlite3 database [' . $this->settings['doctrine']['connection']['path'] . ']');
-            return;
+            return Command::INVALID;
         }
         $dbi->exec('BEGIN TRANSACTION;');
 
@@ -54,7 +54,7 @@ class InitDB extends Command
             if (!$dbi->exec($query)) {
                 $output->writeLn('Can\'t execute SQL query "' . $query . '": ' . $dbi->lastErrorMsg());
                 $dbi->exec('ROLLBACK;');
-                return;
+                return Command::FAILURE;
             }
         }
 
@@ -62,5 +62,7 @@ class InitDB extends Command
 
         $output->writeLn("Database structure created");
         $dbi->close();
+        
+        return Command::SUCCESS;
     }
 }
