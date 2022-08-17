@@ -15,5 +15,7 @@ return function(App $app) {
 
     $app->add(TwigMiddleware::createFromContainer($app));
     
+    $app->add(new \App\Middleware\BaseUrlMiddleware($app->getBasePath()));
+    
     $app->add(new \RKA\Middleware\ProxyDetection());
 };
