@@ -25,4 +25,11 @@ final class HomeController extends BaseController
 
         return $this->render($request, $response, 'post.twig', ['post' => $post]);
     }
+
+    public function error(Request $request, Response $response, array $args = []): Response
+    {
+        $this->logger->info("Error log");
+
+        throw new \Slim\Exception\HttpInternalServerErrorException($request, "Try error handler");
+    }
 }

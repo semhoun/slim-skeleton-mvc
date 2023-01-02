@@ -24,7 +24,6 @@ $dependencies($containerBuilder);
 
 // Build PHP-DI Container instance
 $container = $containerBuilder->build();
-
 $settings = $container->get('settings');
 
 // Instantiate the app
@@ -49,9 +48,11 @@ if (!$settings['debug']) {
 $app->addRoutingMiddleware();
 
 // Add error handling middleware.
-$errorMiddleware = $app->addErrorMiddleware($settings['debug'], !$settings['debug'], false);
-$errorHandler = $errorMiddleware->getDefaultErrorHandler();
-$errorHandler->registerErrorRenderer('text/html', App\Renderer\HtmlErrorRenderer::class);
+if (!$settings['debug']) {
+    $errorMiddleware = $app->addErrorMiddleware(false, true, false);
+    $errorHandler = $errorMiddleware->getDefaultErrorHandler();
+    $errorHandler->registerErrorRenderer('text/html', App\Renderer\HtmlErrorRenderer::class);
+}
 
 // Run the app
 $app->run();

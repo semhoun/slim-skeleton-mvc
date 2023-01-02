@@ -5,7 +5,11 @@ use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 
 return function (App $app) {
+    $container = $app->getContainer();
+    $settings = $container->get('settings');
+
     $app->get('/', 'App\Controller\HomeController:index')->setName('home');
+    $app->get('/error', 'App\Controller\HomeController:error')->setName('error');
 
     $app->get('/post/{id}', 'App\Controller\HomeController:viewPost')->setName('post');
 
@@ -14,4 +18,8 @@ return function (App $app) {
         $group->get('/logout', 'App\Controller\AuthController:logout')->setName('logout');
 
     });
+
+    if ($settings['debug'] == true && $settings['tracy']['enableConsoleRoute'] == true) {
+        $app->post('/console', 'RunTracy\Controllers\RunTracyConsole:index');
+    }
 };
