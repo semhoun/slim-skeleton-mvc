@@ -36,7 +36,7 @@ class SessionMiddleware implements Middleware, ArrayAccess
     /**
      * ArrayAccess for storage
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if (is_null($offset)) {
             $this->storage[] = $value;
@@ -44,15 +44,15 @@ class SessionMiddleware implements Middleware, ArrayAccess
             $this->storage[$offset] = $value;
         }
     }
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->storage[$offset]);
     }
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->storage[$offset]);
     }
-    public function &offsetGet($offset)
+    public function &offsetGet(mixed $offset): mixed
     {
         if ($this->offsetExists($offset)) {
             return  $this->storage[$offset];
