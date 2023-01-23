@@ -9,7 +9,7 @@ use Tracy\Debugger;
 return function (ContainerBuilder $containerBuilder) {
     $rootPath = realpath(__DIR__ . '/..');
     $debug = (getenv('APPLICATION_ENV') != 'production');
-    $isDocker = getenv('docker');
+    $docker = getenv('docker');
 
     // Global Settings Object
     $containerBuilder->addDefinitions([
@@ -53,8 +53,8 @@ return function (ContainerBuilder $containerBuilder) {
             // monolog settings
             'logger' => [
                 'name' => 'app',
-                'path' =>  $isDocker ? 'php://stdout' : $rootPath . '/var/log/app.log',
-                'level' => ($debug) ? Logger::DEBUG : Logger::INFO,
+                'path' =>  $docker ? 'php://stdout' : $rootPath . '/var/log/app.log',
+                'level' => $debug ? Logger::DEBUG : Logger::INFO,
             ],
 
             'tracy' => [

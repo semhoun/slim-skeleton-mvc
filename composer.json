@@ -11,12 +11,6 @@
             "homepage": "http://www.semhoun.net"
         }
     ],
-		"repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/darkalchemy/runtracy.git"
-    }
-  ],
     "autoload": {
         "psr-4": {
             "App\\Controller\\": "src/Controller",
@@ -34,12 +28,12 @@
         "php-di/php-di": "^6.3",
         "slim/twig-view": "^3.3",
         "slim/flash": "^0.4.0",
-        "monolog/monolog": "^3.0",
+        "monolog/monolog": "^2.0",
         "doctrine/orm": "^2",
         "symfony/console": "^6.0",
         "semhoun/proxy-detection-middleware": "^0.5.0",
         "symfony/cache": "^6.0",
         "doctrine/annotations": "^1.13",
-        "runcmf/runtracy": "^0.2.15"
+        "semhoun/runtracy": "^0.2.16"
     }
 }
