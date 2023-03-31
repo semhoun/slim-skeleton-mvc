@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
-use Slim\Factory\ServerRequestCreatorFactory;
 
 // Set the absolute path to the root directory.
 $rootPath = realpath(__DIR__ . '/..');
@@ -48,11 +47,9 @@ if (!$settings['debug']) {
 $app->addRoutingMiddleware();
 
 // Add error handling middleware.
-if (!$settings['debug']) {
-    $errorMiddleware = $app->addErrorMiddleware(false, true, false);
-    $errorHandler = $errorMiddleware->getDefaultErrorHandler();
-    $errorHandler->registerErrorRenderer('text/html', App\Renderer\HtmlErrorRenderer::class);
-}
+$errorMiddleware = $app->addErrorMiddleware($settings['debug'], true, !$settings['debug']);
+$errorHandler = $errorMiddleware->getDefaultErrorHandler();
+$errorHandler->registerErrorRenderer('text/html', App\Renderer\HtmlErrorRenderer::class);
 
 // Run the app
 $app->run();

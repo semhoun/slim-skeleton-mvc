@@ -8,8 +8,8 @@ use Tracy\Debugger;
 
 return function (ContainerBuilder $containerBuilder) {
     $rootPath = realpath(__DIR__ . '/..');
-    $debug = (getenv('APPLICATION_ENV') != 'production');
-    $docker = getenv('docker');
+    $debug = true;
+    $docker = true;
 
     // Global Settings Object
     $containerBuilder->addDefinitions([
@@ -58,7 +58,7 @@ return function (ContainerBuilder $containerBuilder) {
             ],
 
             'tracy' => [
-                'enableConsoleRoute' => true,
+                'enableConsoleRoute' => $debug,
                 'showPhpInfoPanel' => 0,
                 'showSlimRouterPanel' => 0,
                 'showSlimEnvironmentPanel' => 0,
