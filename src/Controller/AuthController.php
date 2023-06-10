@@ -10,7 +10,7 @@ final class AuthController extends BaseController
 
     private function auth(string $uname, string $pswd)
     {
-        $uinfo = $this->em->getRepository(\App\Entity\User::Class)->findOneByUsername($uname);
+        $uinfo = $this->entityManager->getRepository(\App\Entity\User::Class)->findOneByUsername($uname);
         if ($uinfo == null) return null;
         if (!password_verify($pswd, $uinfo->getPassword())) return null;
 

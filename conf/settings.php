@@ -69,7 +69,7 @@ return function (ContainerBuilder $containerBuilder) {
                 'showTwigPanel' => 0,
                 'showIdiormPanel' => 0, // > 0 mean you enable logging
                 // but show or not panel you decide in browser in panel selector
-                'showDoctrinePanel' => 'em', // here also enable logging and you must enter your Doctrine container name
+                'showDoctrinePanel' => 'entity_manager', // here also enable logging and you must enter your Doctrine container name
                 // and also as above show or not panel you decide in browser in panel selector
                 'showProfilerPanel' => 0,
 

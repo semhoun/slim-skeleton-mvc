@@ -10,14 +10,14 @@ abstract class BaseController
     protected $view;
     protected $logger;
     protected $flash;
-    protected $em;  // Entities Manager
+    protected $entityManager;
 
     public function __construct(ContainerInterface $container)
     {
         $this->view = $container->get('view');
         $this->logger = $container->get('logger');
         $this->flash = $container->get('flash');
-        $this->em = $container->get('em');
+        $this->entityManager = $container->get('entity_manager');
     }
 
     protected function render(Request $request, Response $response, string $template, array $params = []): Response

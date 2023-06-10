@@ -27,7 +27,7 @@ return function (ContainerBuilder $containerBuilder) {
 
             return $logger;
         },
-        'em' => function (ContainerInterface $container) {
+        'entity_manager' => function (ContainerInterface $container) {
             $settings = $container->get('settings');
             $config = ORMSetup::createAnnotationMetadataConfiguration(
                 $settings['doctrine']['meta']['entity_path'],
