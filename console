@@ -1,0 +1,64 @@
+#!/usr/bin/env php
+<?php
+use App\Services\Settings;
+use DI\ContainerBuilder;
+use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
+use Doctrine\Migrations\Configuration\Migration\ConfigurationArray;
+use Doctrine\Migrations\Tools\Console\Command;
+use Doctrine\Migrations\DependencyFactory;
+use Doctrine\ORM\EntityManager;
+use Symfony\Component\Console\Application;
+
+// Set the absolute path to the root directory.
+$rootPath = realpath(__DIR__);
+
+// Include the composer autoloader.
+include_once ($rootPath . '/vendor/autoload.php');
+
+// At this point the container has not been built. We need to load the settings manually.
+$settings = Settings::load();
+
+// DI Builder
+$containerBuilder = new ContainerBuilder();
+
+if (!$settings->get('debug')) {
+    // Compile and cache container.
+    $containerBuilder->enableCompilation($settings->get('cache_dir') . '/container');
+}
+
+// Set up dependencies
+$containerBuilder->addDefinitions($rootPath . '/config/dependencies.php');
+
+// Build PHP-DI Container instance
+$container = $containerBuilder->build();
+
+// Doctrine migration
+$dependencyFactory = DependencyFactory::fromEntityManager(
+    new ConfigurationArray($container->get(Settings::class)->get('doctrine.migrations')),
+    new ExistingEntityManager($container->get(EntityManager::class))
+);
+
+// Build the app
+$cli = new Application();
+$cli->add(new \App\Console\CacheClearConsoleCommand($settings));
+
+
+$cli->addCommands([
+    new Command\DumpSchemaCommand($dependencyFactory),
+    new Command\ExecuteCommand($dependencyFactory),
+    new Command\GenerateCommand($dependencyFactory),
+    new Command\LatestCommand($dependencyFactory),
+    new Command\ListCommand($dependencyFactory),
+    new Command\MigrateCommand($dependencyFactory),
+    new Command\RollupCommand($dependencyFactory),
+    new Command\StatusCommand($dependencyFactory),
+    new Command\SyncMetadataCommand($dependencyFactory),
+    new Command\VersionCommand($dependencyFactory),
+]);
+
+try {
+    exit($cli->run());
+} catch (Throwable $exception) {
+    echo $exception->getMessage();
+    exit(1);
+}

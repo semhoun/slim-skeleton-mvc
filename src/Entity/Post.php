@@ -1,80 +1,62 @@
 <?php
-namespace App\Entity;
 
+declare(strict_types=1);
+
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- *  Post
- *
- * @ORM\Table(name="post")
- * @ORM\Entity
- */
-class Post
+#[ORM\Table(name: 'post')]
+#[ORM\Entity]
+final class Post
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private int $id;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="title", type="string", length=100, nullable=true, options={"default"="null","fixed"=true})
-     */
-    private $title = 'null';
+    #[ORM\Column(name: 'title', type: 'string', length: 100, nullable: true)]
+    private ?string $title = 'null';
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="slug", type="string", length=200, nullable=false, options={"fixed"=true})
-     */
-    private $slug;
+    #[ORM\Column(name: 'slug', type: 'string', length: 200, nullable: false)]
+    private string $slug;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="content", type="text", nullable=false)
-     */
-    private $content;
+    #[ORM\Column(name: 'content', type: 'text', nullable: false)]
+    private string $content;
 
-    /********************
+    /*
      * Getter and Setter
-     ********************/
-    public function getId() : int
+     */
+    public function getId(): int
     {
-      return $this->id;
+        return $this->id;
     }
-    public function setId(int $val)
+    public function setId(int $val): void
     {
-      $this->id = $val;
+        $this->id = $val;
     }
-    public function getTitle() : ?string
+    public function getTitle(): ?string
     {
-      return $this->title;
+        return $this->title;
     }
-    public function setTitle(?string $val)
+    public function setTitle(?string $val): void
     {
-      $this->title = $val;
+        $this->title = $val;
     }
-    public function getSlug() : string
+    public function getSlug(): string
     {
-      return $this->slug;
+        return $this->slug;
     }
-    public function setSlug(string $val)
+    public function setSlug(string $val): void
     {
-      $this->slug = $val;
+        $this->slug = $val;
     }
-    public function getContent() : string
+    public function getContent(): string
     {
-      return $this->content;
+        return $this->content;
     }
-    public function setContent(string $val)
+    public function setContent(string $val): void
     {
-      $this->content = $val;
+        $this->content = $val;
     }
 }

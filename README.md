@@ -7,9 +7,10 @@ This is a simple web application skeleton project that uses the [Slim4 Framework
 * [Slim-Psr7](https://github.com/slimphp/Slim-Psr7) as PSR-7 implementation
 * [Doctrine](https://github.com/doctrine/orm) as ORM
 * [Twig](https://twig.symfony.com/) as template engine
-* [Flash messages](https://github.com/slimphp/Slim-Flash)
 * [Monolog](https://github.com/Seldaek/monolog)
-* [Console](https://github.com/symfony/console)
+* [Symfony Console](https://github.com/symfony/console)
+* [Proxy Detection](https://github.com/akrabat/proxy-detection-middleware)
+* [PHP Insights](https://phpinsights.com/) and [Rector](https://getrector.com/) for code quality
 
 
 ## Prepare
@@ -18,7 +19,7 @@ This is a simple web application skeleton project that uses the [Slim4 Framework
 ```bash
 composer create-project semhoun/slim-skeleton-mvc [your-app]
 ```
-2. Create database: `./bin/console.php app:init-db`
+2. Create database (inside your-app): `./console.php migrations:migrate`
 
 
 ## Run it:
@@ -32,5 +33,3 @@ composer create-project semhoun/slim-skeleton-mvc [your-app]
 
 - Set `var` folder permission to writable when deploy to production environment
 - Default login/password is *admin*/*admin*
-- To generate Doctrine entities:`./bin/console.php orm:convert-mapping --from-database annotation ./src/Entity`
-    :warning: *Delete all entities before re-generate to update entities.*

@@ -1,35 +1,37 @@
 <?php
+
+declare(strict_types=1);
+
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManager;
+use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Views\Twig;
 
-final class HomeController extends BaseController
+final class HomeController
 {
-    public function index(Request $request, Response $response, array $args = []): Response
-    {
-        $this->logger->info("Home page action dispatched");
-
-        return $this->render($request, $response, 'index.twig');
+    public function __construct(
+        private Logger $logger,
+        private Twig $view,
+        private EntityManager $entityManager
+    ) {
     }
 
-    public function viewPost(Request $request, Response $response, array $args = []): Response
+    public function index(Request $request, Response $response): Response
     {
-        $this->logger->info("View post using Doctrine with Slim 4");
+        $this->logger->info('Home page action dispatched');
 
-        try {
-            $post = $this->entityManager->find('App\Entity\Post', intval($args['id']));
-        } catch (\Exception $e) {
-            throw new \Slim\Exception\HttpInternalServerErrorException($request, $e->getMessage());
-        }
-
-        return $this->render($request, $response, 'post.twig', ['post' => $post]);
+        return $this->view->render($response, 'index.twig', [
+            'uinfo' => $request->getAttribute('uinfo'),
+        ]);
     }
 
-    public function error(Request $request, Response $response, array $args = []): Response
+    public function error(Request $request, Response $response): Response
     {
-        $this->logger->info("Error log");
+        $this->logger->info('Error log');
 
-        throw new \Slim\Exception\HttpInternalServerErrorException($request, "Try error handler");
+        throw new \Slim\Exception\HttpInternalServerErrorException($request, 'Try error handler');
     }
 }

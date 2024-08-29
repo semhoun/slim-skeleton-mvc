@@ -1,55 +1,55 @@
 <?php
+
 declare(strict_types=1);
 
+use App\Services\Settings;
 use DI\ContainerBuilder;
-use Slim\Factory\AppFactory;
 
 // Set the absolute path to the root directory.
 $rootPath = realpath(__DIR__ . '/..');
 
 // Include the composer autoloader.
-include_once($rootPath . '/vendor/autoload.php');
+include_once $rootPath . '/vendor/autoload.php';
 
-// Instantiate PHP-DI ContainerBuilder
+// At this point the container has not been built. We need to load the settings manually.
+$settings = Settings::load();
+
+// DI Builder
 $containerBuilder = new ContainerBuilder();
 
-// Set up settings
-$settings = require $rootPath . '/conf/settings.php';
-$settings($containerBuilder);
+if (! $settings->get('debug')) {
+    // Compile and cache container.
+    $containerBuilder->enableCompilation($settings->get('cache_dir').'/container');
+}
 
 // Set up dependencies
-$dependencies = require $rootPath . '/conf/dependencies.php';
-$dependencies($containerBuilder);
+$containerBuilder->addDefinitions($rootPath.'/config/dependencies.php');
 
 // Build PHP-DI Container instance
 $container = $containerBuilder->build();
-$settings = $container->get('settings');
 
 // Instantiate the app
-$app = AppFactory::createFromContainer($container);
-$app->setBasePath($settings['base_path']);
+$app = \DI\Bridge\Slim\Bridge::create($container);
 
 // Register middleware
-$middleware = require $rootPath . '/conf/middleware.php';
+$middleware = require $rootPath . '/config/middleware.php';
 $middleware($app);
 
 // Register routes
-$routes = require $rootPath . '/conf/routes.php';
+$routes = require $rootPath . '/config/routes.php';
 $routes($app);
 
 // Set the cache file for the routes. Note that you have to delete this file
 // whenever you change the routes.
-if (!$settings['debug']) {
-	$app->getRouteCollector()->setCacheFile($settings['route_cache']);
+if (! $settings->get('debug')) {
+    $app->getRouteCollector()->setCacheFile($settings->get('cache_dir').'/route');
 }
 
 // Add the routing middleware.
 $app->addRoutingMiddleware();
 
-// Add error handling middleware.
-$errorMiddleware = $app->addErrorMiddleware($settings['debug'], true, !$settings['debug']);
-$errorHandler = $errorMiddleware->getDefaultErrorHandler();
-$errorHandler->registerErrorRenderer('text/html', App\Renderer\HtmlErrorRenderer::class);
+// Add Body Parsing Middleware
+$app->addBodyParsingMiddleware();
 
 // Run the app
 $app->run();

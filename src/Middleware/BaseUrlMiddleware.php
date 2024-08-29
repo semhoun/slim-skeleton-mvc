@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Middleware;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Slim\App;
+use Slim\Views\Twig;
 
 /**
  * Middleware.
@@ -14,19 +18,14 @@ final class BaseUrlMiddleware implements MiddlewareInterface
 {
     /**
      * The app base path.
-     *
-     * @var string
      */
-    private $basePath;
+    private string $basePath;
 
-    /**
-     * The constructor.
-     *
-     * @param string $basePath The slim app basePath ($app->getBasePath())
-     */
-    public function __construct(string $basePath = '')
-    {
-        $this->basePath = $basePath;
+    public function __construct(
+        App $app,
+        private Twig $view
+    ) {
+        $this->basePath = $app->getBasePath();
     }
 
     /**
@@ -39,7 +38,9 @@ final class BaseUrlMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $request = $request->withAttribute('base_url', $this->getBaseUrl($request));
+        $baseUrl = $this->getBaseUrl($request);
+        $this->view->getEnvironment()->addGlobal('base_url', $baseUrl);
+        $request = $request->withAttribute('base_url', $baseUrl);
 
         return $handler->handle($request);
     }
@@ -59,12 +60,8 @@ final class BaseUrlMiddleware implements MiddlewareInterface
         $scheme = $uri->getScheme();
         $authority = $uri->getAuthority();
         $basePath = $this->basePath;
-        
-        if ($request->hasHeader('HTTP_X_FORWARDED_PROTO')) {
-            $scheme = $request->getHeader('HTTP_X_FORWARDED_PROTO')[0];
-        }
 
-        if ($authority !== '' && strpos($basePath, '/') !== 0) {
+        if ($authority !== '' && ! str_starts_with($basePath, '/')) {
             $basePath .= '/' . $basePath;
         }
 
