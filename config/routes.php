@@ -19,8 +19,8 @@ return static function (App $app): void {
     });
 
     $settings = $app->getContainer()->get(Settings::class);
-    if ($settings->get('debug') === true && $settings->get('tracy.enableConsoleRoute') === true) {
-        $app->post('/console', 'RunTracy\Controllers\RunTracyConsole:index');
+    if ($settings->get('debug') && $settings->get('tracy.configs.ConsoleEnable')) {
+        $app->post('/console', 'SlimTracy\Controllers\SlimTracyConsole:index');
     }
 
     // Not Found

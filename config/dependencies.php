@@ -13,10 +13,12 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
 return [
-    // Doctrine Dbal.
-    \Doctrine\DBAL\Connection::class => static fn (Settings $settings): \Doctrine\DBAL\Connection => \Doctrine\DBAL\DriverManager::getConnection($settings->get('doctrine.connection')),
-    // Doctrine EntityManager.
-    EntityManager::class => static function (Settings $settings, \Doctrine\DBAL\Connection $connection): EntityManager {
+    // Doctrine Dbal connection
+    \Doctrine\DBAL\Connection::class => static function (Settings $settings, Doctrine\ORM\Configuration $conf): Doctrine\DBAL\Connection {
+        return \Doctrine\DBAL\DriverManager::getConnection($settings->get('doctrine.connection'), $conf);
+    },
+    // Doctrine Config used by entity manager and Tracy
+    \Doctrine\ORM\Configuration::class => static function (Settings $settings): Doctrine\ORM\Configuration {
         if ($settings->get('debug')) {
             $queryCache = new ArrayAdapter();
             $metadataCache = new ArrayAdapter();
@@ -38,6 +40,11 @@ return [
         } else {
             $config->setAutoGenerateProxyClasses(false);
         }
+
+        return $config;
+    },
+    // Doctrine EntityManager.
+    EntityManager::class => static function (\Doctrine\ORM\Configuration $config, \Doctrine\DBAL\Connection $connection): EntityManager {
         return new EntityManager($connection, $config);
     },
     EntityManagerInterface::class => DI\get(EntityManager::class),
@@ -53,5 +60,13 @@ return [
 
         return $logger;
     },
-    Twig::class => static fn (Settings $settings): Twig => Twig ::create($settings->get('view.template_path'), $settings->get('view.twig')),
+    Twig::class => static function (Settings $settings, \Twig\Profiler\Profile $profile): Twig {
+        $view = Twig::create($settings->get('view.template_path'), $settings->get('view.twig'));
+        if ($settings->get('debug')) {
+            // Add extensions
+            $view->addExtension(new \Twig\Extension\ProfilerExtension($profile));
+            $view->addExtension(new \Twig\Extension\DebugExtension());
+        }
+        return $view;
+    },
 ];

@@ -8,6 +8,7 @@ use App\Services\Settings;
 use Slim\App;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use Tracy\Debugger;
 
 return static function (App $app): void {
     $container = $app->getContainer();
@@ -22,12 +23,8 @@ return static function (App $app): void {
 
     // Add error handling middleware.
     if ($settings->get('debug')) {
-        //$app->add(new RunTracy\Middlewares\TracyMiddleware($app));
-        $errorMiddleware = $app->addErrorMiddleware(true, true, false);
-        $errorHandler = $errorMiddleware->getDefaultErrorHandler();
-        $errorHandler->registerErrorRenderer('text/html', \App\Renderer\HtmlErrorRenderer::class);
-        $errorHandler->registerErrorRenderer('application/json', \App\Renderer\JsonErrorRenderer::class);
-        $errorHandler->setDefaultErrorRenderer('application/json', \App\Renderer\JsonErrorRenderer::class);
+        $app->add(new SlimTracy\Middlewares\TracyMiddleware($app, $container->get(Settings::class)->get('tracy')));
+        Debugger::enable(Debugger::Development);
     } else {
         $errorMiddleware = $app->addErrorMiddleware(false, true, false);
         $errorHandler = $errorMiddleware->getDefaultErrorHandler();
