@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-class Settings
+final class Settings
 {
     /**
      * @param $settings Array of all settings

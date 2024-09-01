@@ -18,12 +18,12 @@ final class PostController
     }
 
     /**
-     * @param $id Id of post to view
+     * @param $postId Id of post to view
      */
-    public function get(Request $request, Response $response, int $id): Response
+    public function get(Request $request, Response $response, int $postId): Response
     {
         try {
-            $post = $this->entityManager->getRepository(\App\Entity\Post::class)->find($id);
+            $post = $this->entityManager->getRepository(\App\Entity\Post::class)->find($postId);
         } catch (\Exception $e) {
             throw new \Slim\Exception\HttpInternalServerErrorException($request, $e->getMessage());
         }
@@ -71,10 +71,10 @@ final class PostController
         return $this->renderer->json($response);
     }
 
-    public function delete(Request $request, Response $response, int $id): Response
+    public function delete(Request $request, Response $response, int $postId): Response
     {
         try {
-            $post = $this->entityManager->getRepository(\App\Entity\Post::class)->find($id);
+            $post = $this->entityManager->getRepository(\App\Entity\Post::class)->find($postId);
             $this->entityManager->remove($post);
             $this->entityManager->flush();
         } catch (\Exception $e) {

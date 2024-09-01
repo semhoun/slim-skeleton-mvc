@@ -12,14 +12,9 @@ final class JsonRenderer
         ResponseInterface $response,
         mixed $data = null,
     ): ResponseInterface {
-        $body = '<html><body>'
-            . '<pre>'
-            . json_encode(
-                $data,
-                JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK
-            )
-            . '</pre>'
-            . '</body></html>';
+        $body = '<html><body><pre>'
+            . json_encode($data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)
+            . '</pre></body></html>';
 
         $response->getBody()->write($body);
 

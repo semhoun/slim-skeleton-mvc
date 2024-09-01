@@ -16,15 +16,17 @@ final class HtmlErrorRenderer implements ErrorRendererInterface
     ) {
     }
 
-    public function __invoke(\Throwable $exception, bool $displayErrorDetails): string
-    {
-        if ($this->settings->get('debug') && $exception->getCode() > 499) {
-            // We are in debug mode, and is not app exeception so we let tracy manage the exception
-            throw $exception;
-        }
-
+    public function __invoke(
+        \Throwable $exception,
+        bool $displayErrorDetails
+    ): string {
         if ($exception->getCode() === 404) {
             return $this->view->fetch('error/404.twig');
+        }
+
+        if ($this->settings->get('debug') && $exception->getCode() > 499) {
+            // We are in debug mode, and is not app exception so we let tracy manage the exception
+            throw $exception;
         }
 
         $title = '500 - ' .  $exception::class;

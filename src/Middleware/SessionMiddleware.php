@@ -11,7 +11,7 @@ use Psr\Http\Server\MiddlewareInterface as Middleware;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Views\Twig;
 
-class SessionMiddleware implements Middleware, ArrayAccess
+final class SessionMiddleware implements Middleware, ArrayAccess
 {
     private array $storage;
 
