@@ -28,9 +28,6 @@ final class BlogController
             throw new \Slim\Exception\HttpInternalServerErrorException($request, $e->getMessage());
         }
 
-        return $this->view->render($response, 'blog.twig', [
-            'uinfo' => $request->getAttribute('uinfo'),
-            'post' => $post,
-        ]);
+        return $this->view->render($response, 'blog.twig', [ 'post' => $post ]);
     }
 }

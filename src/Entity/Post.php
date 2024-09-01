@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: 'post')]
 #[ORM\Entity]
-final class Post
+final class Post implements \JsonSerializable
 {
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
@@ -17,9 +17,6 @@ final class Post
 
     #[ORM\Column(name: 'title', type: 'string', length: 100, nullable: true)]
     private ?string $title = 'null';
-
-    #[ORM\Column(name: 'slug', type: 'string', length: 200, nullable: false)]
-    private string $slug;
 
     #[ORM\Column(name: 'content', type: 'text', nullable: false)]
     private string $content;
@@ -43,14 +40,6 @@ final class Post
     {
         $this->title = $val;
     }
-    public function getSlug(): string
-    {
-        return $this->slug;
-    }
-    public function setSlug(string $val): void
-    {
-        $this->slug = $val;
-    }
     public function getContent(): string
     {
         return $this->content;
@@ -58,5 +47,14 @@ final class Post
     public function setContent(string $val): void
     {
         $this->content = $val;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'content' => $this->content,
+        ];
     }
 }

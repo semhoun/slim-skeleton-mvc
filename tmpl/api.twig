@@ -1,0 +1,83 @@
+{% extends 'layout.twig' %}
+
+{% block contents %}
+    <h1>
+        Slim4 API
+    </h1>
+
+    <p>
+        This skeleton, provide an API exemple.
+    </p>
+
+    <h2 class="mt-4">
+        API Routes
+    </h2>
+
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Method</th>
+                    <th scope="col">Path</th>
+					<th scope="col">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        GET
+                    </td>
+                    
+					<td>
+                        <a href="{{ url_for('apiPostGetAll') }}">/api/post</a>
+                    </td>
+					<td>
+                        Get All posts
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        GET
+                    </td>
+                    
+					<td>
+                        /api/post/{id}
+                    </td>
+					<td>
+                        Get a post identified by is id
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        POST
+                    </td>
+                    
+					<td>
+                        /api/post
+                    </td>
+					<td>
+                        Add a post, JSON body must be:<br>
+						<pre>{
+  "title": "Blog Title",
+  "content": "Blog content."
+}
+</pre>						
+                    </td>
+                </tr>
+                <tr>
+					<td>
+                        DELETE
+                    </td>
+                    
+					<td>
+                        /api/post/{id}
+                    </td>
+					<td>
+                        Delete a post identified by is id
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

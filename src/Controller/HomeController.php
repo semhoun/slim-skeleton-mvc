@@ -23,9 +23,12 @@ final class HomeController
     {
         $this->logger->info('Home page action dispatched');
 
-        return $this->view->render($response, 'index.twig', [
-            'uinfo' => $request->getAttribute('uinfo'),
-        ]);
+        return $this->view->render($response, 'index.twig');
+    }
+
+    public function apiInfo(Request $request, Response $response): Response
+    {
+        return $this->view->render($response, 'api.twig');
     }
 
     public function error(Request $request, Response $response): Response

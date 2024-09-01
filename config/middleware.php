@@ -25,11 +25,10 @@ return static function (App $app): void {
     if ($settings->get('debug')) {
         $app->add(new SlimTracy\Middlewares\TracyMiddleware($app, $container->get(Settings::class)->get('tracy')));
         Debugger::enable(Debugger::Development);
-    } else {
-        $errorMiddleware = $app->addErrorMiddleware(false, true, false);
-        $errorHandler = $errorMiddleware->getDefaultErrorHandler();
-        $errorHandler->registerErrorRenderer('text/html', \App\Renderer\HtmlErrorRenderer::class);
-        $errorHandler->registerErrorRenderer('application/json', \App\Renderer\JsonErrorRenderer::class);
-        $errorHandler->setDefaultErrorRenderer('application/json', \App\Renderer\JsonErrorRenderer::class);
     }
+    $errorMiddleware = $app->addErrorMiddleware($settings->get('debug'), true, true);
+    $errorHandler = $errorMiddleware->getDefaultErrorHandler();
+    $errorHandler->registerErrorRenderer('text/html', \App\Renderer\HtmlErrorRenderer::class);
+    $errorHandler->registerErrorRenderer('application/json', \App\Renderer\JsonErrorRenderer::class);
+    $errorHandler->setDefaultErrorRenderer('application/json', \App\Renderer\JsonErrorRenderer::class);
 };

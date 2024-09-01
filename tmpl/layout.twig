@@ -29,17 +29,28 @@
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 					<li class="nav-item{% if is_current_url('home') %} active{% endif %}">
 						<a class="nav-link" href="{{ url_for('home') }}">
-							Home
 							{% if is_current_url('home') %}
-								<span class="sr-only">(current)</span>
+								<strong>Home</strong>
+							{% else %}
+								Home
 							{% endif %}
 						</a>
 					</li>
 					<li class="nav-item{% if is_current_url('blog', {id: '1'}) %} active{% endif %}">
-						<a class="nav-link" href="{{ url_for('blog', {id: '1'}) }}">
-							Blog
+						<a class="nav-link " href="{{ url_for('blog', {id: '1'}) }}">
 							{% if is_current_url('blog', {id: '1'}) %}
-								<span class="sr-only">(current)</span>
+								<strong>Blog</strong>
+							{% else %}
+								Blog
+							{% endif %}
+						</a>
+					</li>
+					<li class="nav-item{% if is_current_url('apiInfo') %} active{% endif %}">
+						<a class="nav-link" href="{{ url_for('apiInfo') }}">
+							{% if is_current_url('apiInfo') %}
+								<strong>API</strong>
+							{% else %}
+								API
 							{% endif %}
 						</a>
 					</li>

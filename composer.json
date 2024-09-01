@@ -3,7 +3,17 @@
     "description": "Simple Slim Framework 4 skeleton with Twig, Monolog, Doctrine in Sqlite.",
     "license": "MIT",
     "type": "project",
-    "keywords": ["slim-framework", "skeleton", "mvc", "sqlite", "twig", "monolog", "doctrine", "console"],
+    "keywords": [
+		"slim-framework",
+		"skeleton",
+		"mvc",
+		"sqlite",
+		"twig",
+		"monolog",
+		"doctrine",
+		"console",
+		"api"
+	],
     "authors": [
         {
             "name": "Nathanael Semhoun",

@@ -20,7 +20,7 @@ return [
         'entity_path' => [Settings::getAppRoot() . '/src/Entity'],
         'connection' => [
             'driver' => 'pdo_sqlite',
-            'path' => Settings::getAppRoot() . '/var/blog.sqlite',
+            'path' => Settings::getAppRoot() . '/var/database.sqlite',
         ],
         'migrations' => [
             'table_storage' => [
@@ -77,7 +77,7 @@ return [
             // XDebugger IDE key
             'XDebugHelperIDEKey' => 'PHPSTORM',
             // Activate the console
-            'ConsoleEnable' => 1,
+            'ConsoleEnable' => 0,
             // Disable login (don't ask for credentials, be careful) values( 1 || 0 )
             'ConsoleNoLogin' => 0,
             // Multi-user credentials values( ['user1' => 'password1', 'user2' => 'password2'] )
