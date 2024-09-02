@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Services\Settings;
-use Monolog\Logger;
+use Monolog\Level;
 
 $debug = getenv('DEBUG_MODE', true) === 'true';
 $docker = getenv('DOCKER_MODE', true) === 'true';
@@ -55,7 +55,7 @@ return [
     'logger' => [
         'name' => 'app',
         'path' => $docker ? 'php://stdout' : Settings::getAppRoot() . '/var/log/app.log',
-        'level' => $debug ? Logger::DEBUG : Logger::INFO,
+        'level' => $debug ? Level::Debug : Level::Info,
     ],
     // tracy
     'tracy' => [

@@ -10,7 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: 'app:cache:clear', description: 'Clear all caches')]
+#[AsCommand(name: 'cache:clear', description: 'Clear all caches')]
 final class CacheClearConsoleCommand extends Command
 {
     public function __construct(
