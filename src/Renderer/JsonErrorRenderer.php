@@ -12,10 +12,9 @@ final class JsonErrorRenderer implements ErrorRendererInterface
         \Throwable $exception,
         bool $displayErrorDetails
     ): string {
-        if (is_a($exception, '\Slim\Exception\HttpException')) {
-            return json_encode([
-                'message' => $exception->getDescription(),
-            ]);
+		if ($exception->getCode() == 0 || $exception->getCode() > 499) {
+            // We are in debug mode, and is not app exception so we let tracy manage the exception
+            throw $exception;
         }
 
         if (($exception->getCode() >= 400 && $exception->getCode() <= 499) ||

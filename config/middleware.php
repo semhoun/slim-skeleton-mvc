@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 use App\Middleware\BaseUrlMiddleware;
@@ -23,7 +22,7 @@ return static function (App $app): void {
 
     // Add error handling middleware.
     if ($settings->get('debug')) {
-        $app->add(new SlimTracy\Middlewares\TracyMiddleware($app, $container->get(Settings::class)->get('tracy')));
+        $app->add(new SlimTracy\Middlewares\TracyMiddleware($app, $settings->get('tracy')));
         Debugger::enable(Debugger::Development);
     }
     $errorMiddleware = $app->addErrorMiddleware($settings->get('debug'), true, true);
