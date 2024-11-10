@@ -1,10 +1,8 @@
 {% extends 'layout.twig' %}
 
 {% block contents %}
-    <h1>
-        Login
-    </h1>
-	<div class="container">
+    <h1>Login</h1>
+	<div class="bg-light p-5 rounded">
 		<form action="{{ url_for('login') }}" method="post">
 			<div class="row mb-3">
 				<label class="col-sm-2 col-form-label" for="exampleInputUsername">Username</label>
@@ -21,4 +19,5 @@
 			<button type="submit" class="btn btn-primary">Submit</button>
 		</form>
 	</div>
+
 {% endblock %}

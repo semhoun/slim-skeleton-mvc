@@ -3,9 +3,11 @@
 {% block contents %}
     <h1>Slim4 Blog</h1>
 
-    {% if post %}
-        <h2>{{ post.title }}</h2>
-        <hr>
-        <p>{{ post.content }}</p>
-    {% endif %}
+    <div class="bg-light p-5 rounded">
+        {% if post %}
+            <h2>{{ post.title }}</h2>
+            <hr>
+            <p>{{ post.content }}</p>
+        {% endif %}
+    </div>
 {% endblock %}

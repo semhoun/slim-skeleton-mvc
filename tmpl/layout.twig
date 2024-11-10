@@ -81,21 +81,17 @@
 	</nav>
 
 	<div class="container">
-		<div class="bg-light p-5 rounded">
-			{% if flash %}
-				{% for f in flash %}
-					<div class="alert alert-primary alert-dismissible fade show" role="alert">
-						{{ f }}
-						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-				{% endfor %}
-			{% endif %}
+		{% if flash %}
+			{% for f in flash %}
+				<div class="alert alert-warning alert-dismissible fade show" role="alert">
+					{{ f }}
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			{% endfor %}
+		{% endif %}
 
-			{% block contents %}
-			{% endblock %}
-		</div>
+		{% block contents %}
+		{% endblock %}
 	</div>
 </main>
 
