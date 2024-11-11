@@ -1,0 +1,57 @@
+{% extends 'layout.twig' %}
+
+{% block contents %}
+    <h1>Administration</h1>
+
+    <h2>Database selection</h2>
+    <form id="database-form">
+        <div class="mb-3">
+            <select class="form-select" id="database">
+                <option value="">Loading...</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Show</button>
+        </div>
+    </form>
+
+    <h2 id='database_title'></h2>
+    <table class="table table-bordered" id="table">
+    </table>
+{% endblock %}
+
+
+{% block scripts %}
+    <script >
+     $(function() {
+         $.ajax({
+             url: "{{ url_for('adminDatabasesInfo') }}"
+         })
+          .done(function(data) {
+              let selOptions = '<option value="">Choose...</option>';
+              for (let i = 0; i < data.length; i++) {
+                  selOptions = selOptions + '<option value="' + data[i]['id'] + '">' + data[i]['title'] + '</option>';
+              }
+              $('#database').html(selOptions);
+          });
+
+         $('#database').on("shown.bs.select",
+                           function(e, clickedIndex, newValue, oldValue) {
+                               console.log(this.value, clickedIndex, newValue, oldValue)
+         });
+
+         $('#database-form').submit(function (e) {
+             e.preventDefault();
+
+             $.ajax({
+                 url: "{{ url_for('admin') }}/database/" + $('#database').val()
+             })
+              .done(function(data) {
+                  $('#table').bootstrapTable('destroy');
+                  $('#database_title').html(data['title']);
+                  $('#table').bootstrapTable(data);
+              });
+         });
+     });
+    </script>
+{% endblock %}

@@ -14,9 +14,7 @@ use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
 return [
     // Doctrine Dbal connection
-    \Doctrine\DBAL\Connection::class => static function (Settings $settings, Doctrine\ORM\Configuration $conf): Doctrine\DBAL\Connection {
-        return \Doctrine\DBAL\DriverManager::getConnection($settings->get('doctrine.connection'), $conf);
-    },
+    \Doctrine\DBAL\Connection::class => static fn (Settings $settings, Doctrine\ORM\Configuration $conf): Doctrine\DBAL\Connection => \Doctrine\DBAL\DriverManager::getConnection($settings->get('doctrine.connection'), $conf),
     // Doctrine Config used by entity manager and Tracy
     \Doctrine\ORM\Configuration::class => static function (Settings $settings): Doctrine\ORM\Configuration {
         if ($settings->get('debug')) {
@@ -44,9 +42,7 @@ return [
         return $config;
     },
     // Doctrine EntityManager.
-    EntityManager::class => static function (\Doctrine\ORM\Configuration $config, \Doctrine\DBAL\Connection $connection): EntityManager {
-        return new EntityManager($connection, $config);
-    },
+    EntityManager::class => static fn (\Doctrine\ORM\Configuration $config, \Doctrine\DBAL\Connection $connection): EntityManager => new EntityManager($connection, $config),
     EntityManagerInterface::class => DI\get(EntityManager::class),
     // Settings.
     Settings::class => DI\factory([Settings::class, 'load']),

@@ -14,6 +14,12 @@ return static function (App $app): void {
 
     $app->get('/blog/{id}', [\App\Controller\BlogController::class, 'view'])->setName('blog');
 
+    $app->group('/admin', static function (Group $group): void {
+        $group->get('', [\App\Controller\AdminController::class, 'view'])->setName('admin');
+        $group->get('/database', [\App\Controller\AdminController::class, 'databasesInfo'])->setName('adminDatabasesInfo');
+        $group->get('/database/{id}', [\App\Controller\AdminController::class, 'databaseExport'])->setName('adminDatabaseExport');
+    });
+
     $app->group('/member', static function (Group $group): void {
         $group->map(['GET', 'POST'], '/login', [\App\Controller\AuthController::class, 'login'])->setName('login');
         $group->get('/logout', [\App\Controller\AuthController::class, 'logout'])->setName('logout');

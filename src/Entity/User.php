@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: 'user')]
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UserRepository::class)]
 final class User
 {
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]

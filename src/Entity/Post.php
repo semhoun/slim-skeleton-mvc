@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Repository\PostRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: 'post')]
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PostRepository::class)]
 final class Post implements \JsonSerializable
 {
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
