@@ -41,6 +41,7 @@ $dependencyFactory = DependencyFactory::fromEntityManager(
 // Build the app
 $cli = new Application();
 $cli->add($container->get(\App\Console\CacheClearConsoleCommand::class));
+$cli->add($container->get(\App\Console\CacheInitConsoleCommand::class));
 
 $cli->addCommands([
     new Command\DumpSchemaCommand($dependencyFactory),

@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: 'post')]
 #[ORM\Entity(repositoryClass: PostRepository::class)]
-final class Post implements \JsonSerializable
+class Post implements \JsonSerializable
 {
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
