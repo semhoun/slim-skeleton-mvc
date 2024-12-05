@@ -17,17 +17,17 @@ final class CacheInitConsoleCommand extends Command
 {
     public function __construct(
         private readonly Settings $settings,
-		private \Doctrine\ORM\EntityManager $entityManager
+        private \Doctrine\ORM\EntityManager $entityManager
     ) {
         parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-		$proxyFactory = $this->entityManager->getProxyFactory();
-		$proxyFactory->generateProxyClasses(
-			$this->entityManager->getMetadataFactory()->getAllMetadata()
-		);
+        $proxyFactory = $this->entityManager->getProxyFactory();
+        $proxyFactory->generateProxyClasses(
+            $this->entityManager->getMetadataFactory()->getAllMetadata()
+        );
 
         return Command::SUCCESS;
     }

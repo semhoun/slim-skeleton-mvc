@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-final class Settings
+final readonly class Settings
 {
     /**
-     * @param $settings Array of all settings
+     * Constructs the class instance with specified settings.
+     *
+     * @param array<string, mixed> $settings An associative array of settings used to configure the instance.
+     *                                       The keys are strings, and the values can be of any type.
      */
     public function __construct(
-        private readonly array $settings
+        private array $settings
     ) {
     }
 
@@ -32,7 +35,17 @@ final class Settings
 
     public static function load(): self
     {
-        return new self(require self::getAppRoot() . '/config/settings.php');
+        $config = require self::getAppRoot() . '/config/settings/_base_.php';
+
+        foreach (glob(self::getAppRoot() . '/config/settings/*.php') as $file) {
+            $key = basename($file, '.php');
+            if ($key === '_base_') {
+                continue;
+            }
+            $config[$key] = require $file;
+        }
+
+        return new self($config);
     }
 
     public static function getAppRoot(): string
