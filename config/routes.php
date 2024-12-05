@@ -11,7 +11,7 @@ return static function (App $app): void {
     $container = $app->getContainer();
     $settings = $container->get(Settings::class);
 
-    $app->get('/health', [Controller\HealthController::class, 'health']);
+    $app->get('/health', [Controller\HealthController::class, 'health'])->setName('health');
     $settings = $app->getContainer()->get(Settings::class);
     if ($settings->get('debug') && $settings->get('tracy.configs.ConsoleEnable')) {
         $app->post('/console', 'SlimTracy\Controllers\SlimTracyConsole:index');
