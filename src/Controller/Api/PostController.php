@@ -56,12 +56,7 @@ final readonly class PostController
             throw new \Slim\Exception\HttpBadRequestException($request, 'Mandatory param not setted');
         }
 
-        $post = new \App\Entity\Post();
-        if (! empty($data['title'])) {
-            $post->setTitle($data['title']);
-        }
-
-        $post->setContent($data['content']);
+        $post = new \App\Entity\Post($data['content'], $data['title'] ?? null);
 
         try {
             $this->entityManager->persist($post);

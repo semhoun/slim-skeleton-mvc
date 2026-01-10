@@ -65,8 +65,9 @@ return [
     ],
 
     'remove' => [
-        SlevomatCodingStandard\Sniffs\ControlStructures\DisallowEmptySniff::class,
-        SlevomatCodingStandard\Sniffs\Functions\UnusedParameterSniff::class,
+        \SlevomatCodingStandard\Sniffs\ControlStructures\DisallowEmptySniff::class,
+        \SlevomatCodingStandard\Sniffs\Functions\UnusedParameterSniff::class,
+        \SlevomatCodingStandard\Sniffs\TypeHints\DisallowMixedTypeHintSniff::class,
     ],
 
     'config' => [

@@ -19,32 +19,11 @@ final readonly class AuthController
 
     public function login(Request $request, Response $response): Response
     {
-        if ($request->getMethod() === 'POST') {
-            $data = $request->getParsedBody();
-
-            if (empty($data['uname']) || empty($data['pswd'])) {
-                return $this->twig->render($response, 'login.twig', ['flash' => ['Empty value in login/password'], 'uinfo' => $request->getAttribute('uinfo')]);
-            }
-
-            // Check the user username / pass
-            $uinfo = $this->auth($data['uname'], $data['pswd']);
-            if (! $uinfo instanceof \App\Entity\User) {
-                return $this->twig->render($response, 'login.twig', ['flash' => ['Invalid login/password'], 'uinfo' => $request->getAttribute('uinfo')]);
-            }
-
-            $session = $request->getAttribute('session');
-            $session['logged'] = true;
-            $session['uinfo'] = [
-                'id' => $uinfo->getId(),
-                'firstname' => $uinfo->getFirstName(),
-                'lastname' => $uinfo->getLastName(),
-                'email' => $uinfo->getEmail(),
-            ];
-
-            return $response->withStatus(302)->withHeader('Location', '/');
+        if ($request->getMethod() !== 'POST') {
+            return $this->twig->render($response, 'login.twig', ['uinfo' => $request->getAttribute('uinfo')]);
         }
 
-        return $this->twig->render($response, 'login.twig', ['uinfo' => $request->getAttribute('uinfo')]);
+        return $this->handleLoginPost($request, $response);
     }
 
     public function logout(Request $request, Response $response): Response
@@ -53,6 +32,46 @@ final readonly class AuthController
         $session['logged'] = false;
         unset($session['uinfo']);
         return $response->withStatus(302)->withHeader('Location', '/');
+    }
+
+    private function handleLoginPost(Request $request, Response $response): Response
+    {
+        $data = $request->getParsedBody();
+        $uname = $data['uname'] ?? '';
+        $pswd = $data['pswd'] ?? '';
+
+        if ($uname === '' || $pswd === '') {
+            return $this->renderLoginError($response, 'Empty value in login/password', $request);
+        }
+
+        $uinfo = $this->auth($uname, $pswd);
+        if (! $uinfo instanceof \App\Entity\User) {
+            return $this->renderLoginError($response, 'Invalid login/password', $request);
+        }
+
+        $this->createSession($request, $uinfo);
+
+        return $response->withStatus(302)->withHeader('Location', '/');
+    }
+
+    private function renderLoginError(Response $response, string $message, Request $request): Response
+    {
+        return $this->twig->render($response, 'login.twig', [
+            'flash' => [$message],
+            'uinfo' => $request->getAttribute('uinfo'),
+        ]);
+    }
+
+    private function createSession(Request $request, \App\Entity\User $user): void
+    {
+        $session = $request->getAttribute('session');
+        $session['logged'] = true;
+        $session['uinfo'] = [
+            'id' => $user->getId(),
+            'firstname' => $user->getFirstName(),
+            'lastname' => $user->getLastName(),
+            'email' => $user->getEmail(),
+        ];
     }
 
     private function auth(string $uname, string $pswd): ?\App\Entity\User

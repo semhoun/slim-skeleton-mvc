@@ -25,11 +25,12 @@ final readonly class Settings
         $parents = explode('.', $parentsStr);
 
         foreach ($parents as $parent) {
-            if (is_array($settings) && (isset($settings[$parent]) || array_key_exists($parent, $settings))) {
-                $settings = $settings[$parent];
-            } else {
-                throw new RuntimeException(sprintf('Trying to fetch invalid setting "%s"', implode('.', $parents)));
+            if (! $this->hasSetting($settings, $parent)) {
+                throw new RuntimeException(sprintf('Trying to fetch invalid setting "%s"', $parentsStr));
             }
+
+            /** @var array<string, mixed> $settings */
+            $settings = $settings[$parent];
         }
 
         return $settings;
@@ -38,14 +39,15 @@ final readonly class Settings
     public static function load(): self
     {
         $config = require self::getAppRoot() . '/config/settings/_base_.php';
+        $configFiles = glob(self::getAppRoot() . '/config/settings/*.php');
 
-        foreach (glob(self::getAppRoot() . '/config/settings/*.php') as $file) {
-            $key = basename($file, '.php');
+        foreach ($configFiles as $configFile) {
+            $key = basename($configFile, '.php');
             if ($key === '_base_') {
                 continue;
             }
 
-            $config[$key] = require $file;
+            $config[$key] = require $configFile;
         }
 
         return new self($config);
@@ -54,5 +56,10 @@ final readonly class Settings
     public static function getAppRoot(): string
     {
         return dirname(__DIR__, 2);
+    }
+
+    private function hasSetting(mixed $settings, string $key): bool
+    {
+        return is_array($settings) && (isset($settings[$key]) || array_key_exists($key, $settings));
     }
 }

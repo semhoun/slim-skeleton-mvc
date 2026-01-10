@@ -9,18 +9,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: 'user')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+final class User
 {
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private int $id;
-
-    #[ORM\Column(name: 'username', type: 'string', length: 30, nullable: false)]
-    private string $username;
-
-    #[ORM\Column(name: 'password', type: 'string', length: 60, nullable: false)]
-    private string $password;
 
     #[ORM\Column(name: 'first_name', type: 'string', length: 50, nullable: true)]
     private ?string $firstName = null;
@@ -31,17 +25,21 @@ class User
     #[ORM\Column(name: 'email', type: 'string', length: 50, nullable: true)]
     private ?string $email = null;
 
+    public function __construct(
+        #[ORM\Column(name: 'username', type: 'string', length: 30, nullable: false)]
+        private string $username,
+        #[ORM\Column(name: 'password', type: 'string', length: 60, nullable: false)]
+        private string $password
+    )
+    {
+    }
+
     /*
-     * Getter and Setter
+     * Getters and behavior methods
      */
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function setId(int $val): void
-    {
-        $this->id = $val;
     }
 
     public function getUsername(): string
@@ -49,9 +47,9 @@ class User
         return $this->username;
     }
 
-    public function setUsername(string $val): void
+    public function changeUsername(string $username): void
     {
-        $this->username = $val;
+        $this->username = $username;
     }
 
     public function getPassword(): string
@@ -59,9 +57,9 @@ class User
         return $this->password;
     }
 
-    public function setPassword(string $val): void
+    public function changePassword(string $password): void
     {
-        $this->password = $val;
+        $this->password = $password;
     }
 
     public function getFirstName(): ?string
@@ -69,9 +67,9 @@ class User
         return $this->firstName;
     }
 
-    public function setFirstName(?string $val): void
+    public function updateFirstName(?string $firstName): void
     {
-        $this->firstName = $val;
+        $this->firstName = $firstName;
     }
 
     public function getLastName(): ?string
@@ -79,9 +77,9 @@ class User
         return $this->lastName;
     }
 
-    public function setLastName(?string $val): void
+    public function updateLastName(?string $lastName): void
     {
-        $this->lastName = $val;
+        $this->lastName = $lastName;
     }
 
     public function getEmail(): ?string
@@ -89,8 +87,8 @@ class User
         return $this->email;
     }
 
-    public function setEmail(?string $val): void
+    public function updateEmail(?string $email): void
     {
-        $this->email = $val;
+        $this->email = $email;
     }
 }

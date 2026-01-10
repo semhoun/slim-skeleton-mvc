@@ -62,11 +62,12 @@ final readonly class BaseUrlMiddleware implements MiddlewareInterface
         $basePath = $this->basePath;
 
         if ($authority !== '' && ! str_starts_with($basePath, '/')) {
-            $basePath .= '/' . $basePath;
+            $basePath = '/' . $basePath;
         }
 
-        return ($scheme !== '' ? $scheme . ':' : '')
-                         . ($authority !== '' && $authority !== '0' ? '//' . $authority : '')
-                         . rtrim($basePath, '/');
+        $schemePart = ($scheme !== '' ? $scheme . ':' : '');
+        $authorityPart = $authority !== '' && $authority !== '0' ? '//' . $authority : '';
+
+        return $schemePart . $authorityPart . rtrim($basePath, '/');
     }
 }

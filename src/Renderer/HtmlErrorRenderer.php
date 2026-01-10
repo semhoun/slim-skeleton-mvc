@@ -20,18 +20,9 @@ final readonly class HtmlErrorRenderer implements ErrorRendererInterface
     }
 
     public function __invoke(
-         Throwable $exception,
+        Throwable $exception,
         bool $displayErrorDetails
     ): string {
-        if ($exception->getCode() === 404) {
-            return $this->twig->fetch('error/404.twig', [
-                'title' => is_a($exception, '\Slim\Exception\HttpException') ?
-                    $exception->getTitle() : '500 - ' .  $exception::class,
-                'code' => $exception->getCode(),
-                'message' => $exception->getMessage(),
-            ]);
-        }
-
         $data = [
             'title' => is_a($exception, '\Slim\Exception\HttpException') ?
                 $exception->getTitle() : '500 - ' .  $exception::class,
@@ -39,21 +30,31 @@ final readonly class HtmlErrorRenderer implements ErrorRendererInterface
             'message' => $exception->getMessage(),
         ];
 
-        $details = [
-            'debug' => $displayErrorDetails,
-            'type' => $exception::class,
-            'file' => $exception->getFile(),
-            'line' => $exception->getLine(),
-            'trace' => $exception->getTraceAsString(),
-        ];
+        if ($exception->getCode() === 404) {
+            return $this->twig->fetch('error/404.twig', $data);
+        }
 
+        $details = $this->getErrorDetails($exception, $displayErrorDetails);
         $this->logger->error('[' . $exception->getCode() . '] ' . $exception->getMessage(), $details);
 
         if ($this->settings->get('debug')) {
-            // We are in debug mode, and is not app exception so we let tracy manage the exception
             throw $exception;
         }
 
         return $this->twig->fetch('error/default.twig', $displayErrorDetails ? array_merge($data, $details) : $data);
+    }
+
+    /**
+     * @return array<string, string|int|bool|null>
+     */
+    private function getErrorDetails(Throwable $throwable, bool $displayErrorDetails): array
+    {
+        return [
+            'debug' => $displayErrorDetails,
+            'type' => $throwable::class,
+            'file' => $throwable->getFile(),
+            'line' => $throwable->getLine(),
+            'trace' => $throwable->getTraceAsString(),
+        ];
     }
 }

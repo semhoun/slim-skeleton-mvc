@@ -15,7 +15,7 @@ final class UserRepository extends EntityRepository
      * Get all the post, but retreive only the id and title
      * Is not optimized, but it show how to get all result if needed.
      *
-     * @return array<mixed> Returns an array containing all posts
+     * @return array<string, array<int, array<string, string|int|null>>> Returns an array containing all posts
      */
     public function adminExport(): array
     {
@@ -24,34 +24,37 @@ final class UserRepository extends EntityRepository
             ->getQuery()
             ->getResult();
 
-        $data = [
+        return [
             'title' => 'User',
-            'columns' => [
-                [
-                    'field' => 'id',
-                    'title' => 'Id',
-                ],
-                [
-                    'field' => 'username',
-                    'title' => 'Username',
-                ],
-                [
-                    'field' => 'firstname',
-                    'title' => 'Firstname',
-                ],
-                [
-                    'field' => 'lastname',
-                    'title' => 'Lastname',
-                ],
-                [
-                    'field' => 'email',
-                    'title' => 'EMail',
-                ],
-            ],
-            'data' => [],
+            'columns' => $this->getColumns(),
+            'data' => $this->formatData($result),
         ];
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    private function getColumns(): array
+    {
+        return [
+            ['field' => 'id', 'title' => 'Id'],
+            ['field' => 'username', 'title' => 'Username'],
+            ['field' => 'firstname', 'title' => 'Firstname'],
+            ['field' => 'lastname', 'title' => 'Lastname'],
+            ['field' => 'email', 'title' => 'EMail'],
+        ];
+    }
+
+    /**
+     * @param array<\App\Entity\User> $result
+     *
+     * @return array<int, array<string, string|int|null>>
+     */
+    private function formatData(array $result): array
+    {
+        $data = [];
         foreach ($result as $row) {
-            $data['data'][] = [
+            $data[] = [
                 'id' => $row->getId(),
                 'username' => $row->getUsername(),
                 'firstname' => $row->getFirstName(),

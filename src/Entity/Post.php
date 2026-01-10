@@ -9,30 +9,28 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: 'post')]
 #[ORM\Entity(repositoryClass: PostRepository::class)]
-class Post implements \JsonSerializable
+final class Post implements \JsonSerializable
 {
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private int $id;
 
-    #[ORM\Column(name: 'title', type: 'string', length: 100, nullable: true)]
-    private ?string $title = 'null';
-
-    #[ORM\Column(name: 'content', type: 'text', nullable: false)]
-    private string $content;
+    public function __construct(
+        #[ORM\Column(name: 'content', type: 'text', nullable: false)]
+        private string $content,
+        #[ORM\Column(name: 'title', type: 'string', length: 100, nullable: true)]
+        private ?string $title = null
+    )
+    {
+    }
 
     /*
-     * Getter and Setter
+     * Getters and behavior methods
      */
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function setId(int $val): void
-    {
-        $this->id = $val;
     }
 
     public function getTitle(): ?string
@@ -40,9 +38,9 @@ class Post implements \JsonSerializable
         return $this->title;
     }
 
-    public function setTitle(?string $val): void
+    public function updateTitle(?string $title): void
     {
-        $this->title = $val;
+        $this->title = $title;
     }
 
     public function getContent(): string
@@ -50,9 +48,9 @@ class Post implements \JsonSerializable
         return $this->content;
     }
 
-    public function setContent(string $val): void
+    public function updateContent(string $content): void
     {
-        $this->content = $val;
+        $this->content = $content;
     }
 
     public function jsonSerialize(): mixed
