@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Lib\DateTime;
-
 final readonly class Health
 {
     public function __construct(
@@ -20,7 +18,7 @@ final readonly class Health
      */
     public function status(): array
     {
-		$now = new \DateTime();
+        $now = new \DateTime();
         return [
             'version' => $this->settings->get('version'),
             'date' => $now->format(DATE_ISO8601),

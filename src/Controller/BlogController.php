@@ -9,10 +9,10 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
-final class BlogController
+final readonly class BlogController
 {
     public function __construct(
-        private Twig $view,
+        private Twig $twig,
         private EntityManager $entityManager
     ) {
     }
@@ -24,10 +24,10 @@ final class BlogController
     {
         try {
             $post = $this->entityManager->getRepository(\App\Entity\Post::class)->find($id);
-        } catch (\Exception $e) {
-            throw new \Slim\Exception\HttpInternalServerErrorException($request, $e->getMessage());
+        } catch (\Exception $exception) {
+            throw new \Slim\Exception\HttpInternalServerErrorException($request, $exception->getMessage());
         }
 
-        return $this->view->render($response, 'blog.twig', [ 'post' => $post ]);
+        return $this->twig->render($response, 'blog.twig', [ 'post' => $post ]);
     }
 }

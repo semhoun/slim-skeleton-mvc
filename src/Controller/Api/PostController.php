@@ -9,10 +9,10 @@ use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-final class PostController
+final readonly class PostController
 {
     public function __construct(
-        private JsonRenderer $renderer,
+        private JsonRenderer $jsonRenderer,
         private EntityManager $entityManager
     ) {
     }
@@ -24,27 +24,28 @@ final class PostController
     {
         try {
             $post = $this->entityManager->getRepository(\App\Entity\Post::class)->find($postId);
-        } catch (\Exception $e) {
-            throw new \Slim\Exception\HttpInternalServerErrorException($request, $e->getMessage());
+        } catch (\Exception $exception) {
+            throw new \Slim\Exception\HttpInternalServerErrorException($request, $exception->getMessage());
         }
 
         // Using interface JsonSerializable to make simplify
-        return $this->renderer->json($response, $post);
+        return $this->jsonRenderer->json($response, $post);
     }
 
     public function getAll(Request $request, Response $response): Response
     {
         try {
             $posts = $this->entityManager->getRepository(\App\Entity\Post::class)->findAll();
-        } catch (\Exception $e) {
-            throw new \Slim\Exception\HttpInternalServerErrorException($request, $e->getMessage());
+        } catch (\Exception $exception) {
+            throw new \Slim\Exception\HttpInternalServerErrorException($request, $exception->getMessage());
         }
 
         // Using html output for debug
         if (preg_match('/html/', $request->getHeaderLine('Accept'))) {
-            return $this->renderer->html($response, $posts);
+            return $this->jsonRenderer->html($response, $posts);
         }
-        return $this->renderer->json($response, $posts);
+
+        return $this->jsonRenderer->json($response, $posts);
     }
 
     public function add(Request $request, Response $response): Response
@@ -59,16 +60,18 @@ final class PostController
         if (! empty($data['title'])) {
             $post->setTitle($data['title']);
         }
+
         $post->setContent($data['content']);
 
         try {
             $this->entityManager->persist($post);
             $this->entityManager->flush();
-        } catch (\Exception $e) {
-            throw new \Slim\Exception\HttpInternalServerErrorException($request, $e->getMessage());
+        } catch (\Exception $exception) {
+            throw new \Slim\Exception\HttpInternalServerErrorException($request, $exception->getMessage());
         }
+
         // Using interface JsonSerializable to make simplify
-        return $this->renderer->json($response);
+        return $this->jsonRenderer->json($response);
     }
 
     public function delete(Request $request, Response $response, int $postId): Response
@@ -77,11 +80,11 @@ final class PostController
             $post = $this->entityManager->getRepository(\App\Entity\Post::class)->find($postId);
             $this->entityManager->remove($post);
             $this->entityManager->flush();
-        } catch (\Exception $e) {
-            throw new \Slim\Exception\HttpInternalServerErrorException($request, $e->getMessage());
+        } catch (\Exception $exception) {
+            throw new \Slim\Exception\HttpInternalServerErrorException($request, $exception->getMessage());
         }
 
         // Using interface JsonSerializable to make simplify
-        return $this->renderer->json($response);
+        return $this->jsonRenderer->json($response);
     }
 }

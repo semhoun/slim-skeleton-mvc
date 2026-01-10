@@ -14,7 +14,7 @@ use Slim\Views\Twig;
 /**
  * Middleware.
  */
-final class BaseUrlMiddleware implements MiddlewareInterface
+final readonly class BaseUrlMiddleware implements MiddlewareInterface
 {
     /**
      * The app base path.
@@ -23,7 +23,7 @@ final class BaseUrlMiddleware implements MiddlewareInterface
 
     public function __construct(
         App $app,
-        private Twig $view
+        private Twig $twig
     ) {
         $this->basePath = $app->getBasePath();
     }
@@ -39,7 +39,7 @@ final class BaseUrlMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $baseUrl = $this->getBaseUrl($request);
-        $this->view->getEnvironment()->addGlobal('base_url', $baseUrl);
+        $this->twig->getEnvironment()->addGlobal('base_url', $baseUrl);
         $request = $request->withAttribute('base_url', $baseUrl);
 
         return $handler->handle($request);
@@ -50,13 +50,13 @@ final class BaseUrlMiddleware implements MiddlewareInterface
      *
      * Note that this method never includes a trailing /
      *
-     * @param ServerRequestInterface $request The request
+     * @param ServerRequestInterface $serverRequest The request
      *
      * @return string The base url
      */
-    public function getBaseUrl(ServerRequestInterface $request): string
+    public function getBaseUrl(ServerRequestInterface $serverRequest): string
     {
-        $uri = $request->getUri();
+        $uri = $serverRequest->getUri();
         $scheme = $uri->getScheme();
         $authority = $uri->getAuthority();
         $basePath = $this->basePath;
@@ -66,7 +66,7 @@ final class BaseUrlMiddleware implements MiddlewareInterface
         }
 
         return ($scheme !== '' ? $scheme . ':' : '')
-                         . ($authority ? '//' . $authority : '')
+                         . ($authority !== '' && $authority !== '0' ? '//' . $authority : '')
                          . rtrim($basePath, '/');
     }
 }

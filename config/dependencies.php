@@ -3,46 +3,63 @@
 declare(strict_types=1);
 
 use App\Services\Settings;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMSetup;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
+use Odan\Session\PhpSession;
+use Odan\Session\SessionInterface;
+use Odan\Session\SessionManagerInterface;
 use Slim\Views\Twig;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
+use Twig\Extension\DebugExtension;
+use Twig\Extension\ProfilerExtension;
 
 return [
     // Doctrine Dbal connection
-    \Doctrine\DBAL\Connection::class => static fn (Settings $settings, Doctrine\ORM\Configuration $conf): Doctrine\DBAL\Connection => \Doctrine\DBAL\DriverManager::getConnection($settings->get('doctrine.connection'), $conf),
+    Connection::class => static function (Settings $settings, Doctrine\ORM\Configuration $configuration): Doctrine\DBAL\Connection {
+        $connectionParams = [
+            'driver' => 'pdo_' . $settings->get('database.driver'),
+        ];
+        if ($settings->get('database.driver') === 'sqlite') {
+            $connectionParams['path'] = $settings->get('database.path');
+        }
+
+        return DriverManager::getConnection($connectionParams, $configuration);
+    },
     // Doctrine Config used by entity manager and Tracy
-    \Doctrine\ORM\Configuration::class => static function (Settings $settings): Doctrine\ORM\Configuration {
-        if ($settings->get('debug')) {
-            $queryCache = new ArrayAdapter();
-            $metadataCache = new ArrayAdapter();
-        } else {
-            $queryCache = new PhpFilesAdapter('queries', 0, $settings->get('cache_dir'));
-            $metadataCache = new PhpFilesAdapter('metadata', 0, $settings->get('cache_dir'));
-        }
+    Configuration::class => static function (Settings $settings): Doctrine\ORM\Configuration {
+        $isDevMode = $settings->get('debug');
+        $entityPaths = $settings->get('database.doctrine.entity_path');
+        $cacheDir = $settings->get('cache_dir');
 
-        $config = new \Doctrine\ORM\Configuration();
-        $config->setMetadataCache($metadataCache);
-        $driverImpl = new \Doctrine\ORM\Mapping\Driver\AttributeDriver($settings->get('doctrine.entity_path'), true);
-        $config->setMetadataDriverImpl($driverImpl);
-        $config->setQueryCache($queryCache);
-        $config->setProxyDir($settings->get('cache_dir') . '/proxy');
-        $config->setProxyNamespace('App\Proxies');
+        $queryCache = $isDevMode ? new ArrayAdapter() : new PhpFilesAdapter('queries', 0, $cacheDir);
+        $metadataCache = $isDevMode ? new ArrayAdapter() : new PhpFilesAdapter('metadata', 0, $cacheDir);
 
-        if ($settings->get('debug')) {
-            $config->setAutoGenerateProxyClasses(true);
-        } else {
-            $config->setAutoGenerateProxyClasses(false);
-        }
+        // Configuration manuelle avec cache explicite
+        $configuration = ORMSetup::createAttributeMetadataConfiguration(
+            $entityPaths,
+            $isDevMode,
+            $cacheDir . '/proxy',
+            $metadataCache
+        );
 
-        return $config;
+        $configuration->setQueryCache($queryCache);
+        $configuration->setProxyDir($cacheDir . '/proxy');
+        $configuration->setProxyNamespace('App\\Proxies');
+
+        $configuration->setAutoGenerateProxyClasses($isDevMode);
+
+        return $configuration;
     },
     // Doctrine EntityManager.
-    EntityManager::class => static fn (\Doctrine\ORM\Configuration $config, \Doctrine\DBAL\Connection $connection): EntityManager => new EntityManager($connection, $config),
+    EntityManager::class => static fn (Configuration $configuration, Connection $connection): EntityManager => new EntityManager($connection, $configuration),
     EntityManagerInterface::class => DI\get(EntityManager::class),
     // Settings.
     Settings::class => DI\factory([Settings::class, 'load']),
@@ -57,12 +74,15 @@ return [
         return $logger;
     },
     Twig::class => static function (Settings $settings, \Twig\Profiler\Profile $profile): Twig {
-        $view = Twig::create($settings->get('view.template_path'), $settings->get('view.twig'));
+        $twig = Twig::create($settings->get('twig.template_path'), $settings->get('twig.config'));
         if ($settings->get('debug')) {
             // Add extensions
-            $view->addExtension(new \Twig\Extension\ProfilerExtension($profile));
-            $view->addExtension(new \Twig\Extension\DebugExtension());
+            $twig->addExtension(new ProfilerExtension($profile));
+            $twig->addExtension(new DebugExtension());
         }
-        return $view;
+
+        return $twig;
     },
+    SessionManagerInterface::class => static fn (SessionInterface $session): SessionInterface => $session,
+    SessionInterface::class => static fn (Settings $settings): PhpSession => new PhpSession($settings->get('session')),
 ];

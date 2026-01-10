@@ -26,33 +26,43 @@
            "App\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
     "require": {
-		"php": "^8.0",
+		"php": "^8.4",
 		"ext-sqlite3": "*",
 		"ext-json": "*",
-		"slim/slim": "^4.14",
-		"slim/psr7": "^1.7",
-		"doctrine/orm": "^3",
-		"doctrine/dbal": "^4",
-		"doctrine/migrations": "^3",
-		"symfony/cache": "^7",
+		"slim/slim": "^4.15",
+		"slim/psr7": "^1.8",
+		"doctrine/orm": "^3.5",
+		"doctrine/dbal": "^4.4",
+		"doctrine/migrations": "^3.9",
+		"symfony/cache": "^7.4",
+        "symfony/var-exporter": "^7.4",
 		"php-di/slim-bridge": "^3.4",
-		"monolog/monolog": "^3.6",
-		"symfony/console": "^6.0",
+		"monolog/monolog": "^3.9",
+		"symfony/console": "^6.4",
         "slim/twig-view": "^3.4",
-        "akrabat/proxy-detection-middleware": "^1.0"
+        "akrabat/proxy-detection-middleware": "^1.1",
+        "odan/session": "^6.4"
     },
 	"require-dev": {
-        "nunomaduro/phpinsights": "^2.11",
-        "rector/rector": "^1.1",
-        "semhoun/slim-tracy": "^1.0"
+      "roave/security-advisories": "dev-latest",
+      "nunomaduro/phpinsights": "^2.13",
+      "rector/rector": "^2.2",
+      "semhoun/slim-tracy": "^1.1",
+      "phpunit/phpunit": "^10"
     },
 	"scripts": {
         "start": "php -S localhost:8080 -t public public/index.php",
-        "rector-check": "rector process --dry-run",
+        "test": "phpunit",
         "rector-fix": "rector process",
         "insights-check": "phpinsights --config-path=./phpinsights.php",
-        "insights-fix": "phpinsights --config-path=./phpinsights.php -- fix"
+        "insights-fix": "phpinsights --config-path=./phpinsights.php -- fix",
+        "pre-commit": "find . \\( -name '*.php' -o -name '*.css' -o -name '*.js' -o -name '*.twig' \\) ! -path './vendor/*' ! -path './var/*' -print0 | xargs -0 dos2unix -l -k -q -s && composer insights-fix && composer rector-fix"
 	},
     "config": {
         "allow-plugins": {

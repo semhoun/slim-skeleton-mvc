@@ -20,6 +20,7 @@ This is a simple web application skeleton project that uses the [Slim4 Framework
 composer create-project semhoun/slim-skeleton-mvc [your-app]
 ```
 2. Create database (inside your-app): `./console.php migrations:migrate`
+3. Run tests: `composer test`
 
 
 ## Run it:

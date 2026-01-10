@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Doctrine\ORM\EntityManager;
-use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
-final class AuthController
+final readonly class AuthController
 {
     public function __construct(
-        private Logger $logger,
-        private Twig $view,
+        private Twig $twig,
         private EntityManager $entityManager
     ) {
     }
@@ -25,13 +23,13 @@ final class AuthController
             $data = $request->getParsedBody();
 
             if (empty($data['uname']) || empty($data['pswd'])) {
-                return $this->view->render($response, 'login.twig', ['flash' => ['Empty value in login/password'], 'uinfo' => $request->getAttribute('uinfo')]);
+                return $this->twig->render($response, 'login.twig', ['flash' => ['Empty value in login/password'], 'uinfo' => $request->getAttribute('uinfo')]);
             }
 
             // Check the user username / pass
             $uinfo = $this->auth($data['uname'], $data['pswd']);
-            if ($uinfo === null) {
-                return $this->view->render($response, 'login.twig', ['flash' => ['Invalid login/password'], 'uinfo' => $request->getAttribute('uinfo')]);
+            if (! $uinfo instanceof \App\Entity\User) {
+                return $this->twig->render($response, 'login.twig', ['flash' => ['Invalid login/password'], 'uinfo' => $request->getAttribute('uinfo')]);
             }
 
             $session = $request->getAttribute('session');
@@ -45,7 +43,8 @@ final class AuthController
 
             return $response->withStatus(302)->withHeader('Location', '/');
         }
-        return $this->view->render($response, 'login.twig', ['uinfo' => $request->getAttribute('uinfo')]);
+
+        return $this->twig->render($response, 'login.twig', ['uinfo' => $request->getAttribute('uinfo')]);
     }
 
     public function logout(Request $request, Response $response): Response
@@ -62,7 +61,8 @@ final class AuthController
         if ($uinfo === null) {
             return null;
         }
-        if (! password_verify($pswd, $uinfo->getPassword())) {
+
+        if (! password_verify($pswd, (string) $uinfo->getPassword())) {
             return null;
         }
 

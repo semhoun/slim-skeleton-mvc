@@ -29,22 +29,27 @@ class Post implements \JsonSerializable
     {
         return $this->id;
     }
+
     public function setId(int $val): void
     {
         $this->id = $val;
     }
+
     public function getTitle(): ?string
     {
         return $this->title;
     }
+
     public function setTitle(?string $val): void
     {
         $this->title = $val;
     }
+
     public function getContent(): string
     {
         return $this->content;
     }
+
     public function setContent(string $val): void
     {
         $this->content = $val;

@@ -10,23 +10,23 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
-final class AdminController
+final readonly class AdminController
 {
     public function __construct(
-        private Twig $view,
-        private JsonRenderer $renderer,
+        private Twig $twig,
+        private JsonRenderer $jsonRenderer,
         private EntityManager $entityManager
     ) {
     }
 
     public function view(Request $request, Response $response): Response
     {
-        return $this->view->render($response, 'admin.twig');
+        return $this->twig->render($response, 'admin.twig');
     }
 
     public function databasesInfo(Request $request, Response $response): Response
     {
-        return $this->renderer->json($response, [
+        return $this->jsonRenderer->json($response, [
             [ 'id' => 'Post', 'title' => 'Blog Post'],
             [ 'id' => 'User', 'title' => 'Users'],
         ]);
@@ -35,6 +35,6 @@ final class AdminController
     public function databaseExport(Request $request, Response $response, string $id): Response
     {
         $data = $this->entityManager->getRepository('\\App\\Entity\\' . $id)->adminExport();
-        return $this->renderer->json($response, $data);
+        return $this->jsonRenderer->json($response, $data);
     }
 }

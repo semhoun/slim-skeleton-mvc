@@ -7,13 +7,13 @@ namespace App\Repository;
 use Doctrine\ORM\EntityRepository;
 
 /**
- * Simple exemple of repository
+ * Simple exemple of repository.
  */
 final class PostRepository extends EntityRepository
 {
     /**
      * Get all the post, but retreive only the id and title
-     * Is not optimized, but it show how to get all result if needed
+     * Is not optimized, but it show how to get all result if needed.
      *
      * @return array<mixed> Returns an array containing all posts
      */

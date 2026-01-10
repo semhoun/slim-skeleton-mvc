@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\Services\Settings;
+use Doctrine\ORM\Configuration;
+use Tracy\Debugger;
+use Twig\Profiler\Profile;
 
 // terminal.js full URI
 $consoleTerminalJs = 'https://cdnjs.cloudflare.com';
@@ -30,6 +33,7 @@ return [
     'showIncludedFiles' => 0,
     'showConsolePanel' => 0,
     'configs' => [
+        'ShowBar' => getenv('DISABLE_TRACY_BAR', true) !== 'true' ? 1 : 0,
         'XDebugHelperIDEKey' => 'PHPSTORM',
         'ConsoleEnable' => 0,
         'ConsoleNoLogin' => 0,
@@ -52,8 +56,14 @@ return [
         ],
         'Container' => [
             // Container entry name
-            'Doctrine' => \Doctrine\ORM\Configuration::class, // must be a configuration DBAL or ORM
-            'Twig' => \Twig\Profiler\Profile::class,
+            'Doctrine' => Configuration::class, // must be a configuration DBAL or ORM
+            'Twig' => Profile::class,
+        ],
+        'Debugger' => [
+            // See \Tracy\Debugger::enable
+            'mode' => Debugger::Development,
+            'logDirectory' => null,
+            'email' => null,
         ],
     ],
 ];

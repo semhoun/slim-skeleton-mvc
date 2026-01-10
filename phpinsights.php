@@ -1,6 +1,10 @@
 <?php
 
+//@see https://github.com/nunomaduro/phpinsights/blob/master/phpinsights.php
+
 declare(strict_types=1);
+
+use PHP_CodeSniffer\Standards\Generic\Sniffs\Files\LineLengthSniff;
 
 return [
 
@@ -55,9 +59,9 @@ return [
     ],
 
     'add' => [
-        //  ExampleMetric::class => [
-        //      ExampleInsight::class,
-        //  ]
+        \NunoMaduro\PhpInsights\Domain\Metrics\Code\Comments::class => [
+            \PhpCsFixer\Fixer\Phpdoc\PhpdocSummaryFixer::class,
+        ],
     ],
 
     'remove' => [
@@ -66,9 +70,11 @@ return [
     ],
 
     'config' => [
-        //  ExampleInsight::class => [
-        //      'key' => 'value',
-        //  ],
+        LineLengthSniff::class => [
+            'lineLimit' => 120,
+            'absoluteLineLimit' => 120,
+            'ignoreComments' => true,
+        ],
     ],
 
     /*
@@ -83,36 +89,8 @@ return [
     */
 
     'requirements' => [
-//        'min-quality' => 0,
-//        'min-complexity' => 0,
-//        'min-architecture' => 0,
-//        'min-style' => 0,
-//        'disable-security-check' => false,
+        'min-quality' => 90.0,
+        'min-architecture' => 85.0,
+        'min-style' => 96.0,
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Threads
-    |--------------------------------------------------------------------------
-    |
-    | Here you may adjust how many threads (core) PHPInsights can use to perform
-    | the analysis. This is optional, don't provide it and the tool will guess
-    | the max core number available. It accepts null value or integer > 0.
-    |
-    */
-
-    'threads' => null,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Timeout
-    |--------------------------------------------------------------------------
-    | Here you may adjust the timeout (in seconds) for PHPInsights to run before
-    | a ProcessTimedOutException is thrown.
-    | This accepts an int > 0. Default is 60 seconds, which is the default value
-    | of Symfony's setTimeout function.
-    |
-    */
-
-    'timeout' => 60,
 ];

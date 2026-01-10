@@ -1,5 +1,9 @@
 #!/usr/bin/env php
 <?php
+
+use App\Console\CacheClearConsoleCommand;
+use App\Console\CacheInitConsoleCommand;
+use App\Console\GenerateProxies;
 use App\Services\Settings;
 use DI\ContainerBuilder;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
@@ -34,14 +38,15 @@ $container = $containerBuilder->build();
 
 // Doctrine migration
 $dependencyFactory = DependencyFactory::fromEntityManager(
-    new ConfigurationArray($container->get(Settings::class)->get('doctrine.migrations')),
+        new ConfigurationArray($container->get(Settings::class)->get('database.doctrine.migrations')),
     new ExistingEntityManager($container->get(EntityManager::class))
 );
 
 // Build the app
 $cli = new Application();
-$cli->add($container->get(\App\Console\CacheClearConsoleCommand::class));
-$cli->add($container->get(\App\Console\CacheInitConsoleCommand::class));
+$cli->add($container->get(CacheClearConsoleCommand::class));
+$cli->add($container->get(CacheInitConsoleCommand::class));
+$cli->add($container->get(GenerateProxies::class));
 
 $cli->addCommands([
     new Command\DumpSchemaCommand($dependencyFactory),

@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 use App\Services\Settings;
+use DI\Bridge\Slim\Bridge;
 use DI\ContainerBuilder;
 
 // Set the absolute path to the root directory.
-$rootPath = realpath(__DIR__ . '/..');
+$rootPath = dirname(__DIR__);
 
 // Include the composer autoloader.
 include_once $rootPath . '/vendor/autoload.php';
@@ -29,7 +30,7 @@ $containerBuilder->addDefinitions($rootPath.'/config/dependencies.php');
 $container = $containerBuilder->build();
 
 // Instantiate the app
-$app = \DI\Bridge\Slim\Bridge::create($container);
+$app = Bridge::create($container);
 
 // Register middleware
 $middleware = require $rootPath . '/config/middleware.php';

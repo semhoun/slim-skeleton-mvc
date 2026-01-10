@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 use App\Services\Settings;
 
-$debug = getenv('DEBUG_MODE', true) === 'true';
-
 return [
     // version, currently juste php version
-    'version' => phpversion(),
+    'version' => '4.2.0',
     // Is debug moderm
-    'debug' => $debug,
+    'debug' => getenv('DEBUG_MODE', true) === 'true',
     // API Base path
     'api_base_path' => '/api',
     // 'Temprorary directory

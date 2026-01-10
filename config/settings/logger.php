@@ -5,13 +5,10 @@ declare(strict_types=1);
 use App\Services\Settings;
 use Monolog\Level;
 
-$debug = getenv('DEBUG_MODE', true) === 'true';
-$docker = getenv('DOCKER_MODE', true) === 'true';
-
 return [
     'name' => 'app',
-    'path' => $docker ?
+    'path' => getenv('DOCKER_MODE', true) === 'true' ?
             'php://stdout'
             : Settings::getAppRoot() . '/var/log/app.log',
-    'level' => $debug ? Level::Debug : Level::Info,
+    'level' => getenv('DEBUG_MODE', true) === 'true' ? Level::Debug : Level::Info,
 ];

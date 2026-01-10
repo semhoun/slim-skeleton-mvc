@@ -9,10 +9,10 @@ use App\Services\Health;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-final class HealthController
+final readonly class HealthController
 {
     public function __construct(
-        private JsonRenderer $renderer,
+        private JsonRenderer $jsonRenderer,
         private Health $health,
     ) {
     }
@@ -27,6 +27,6 @@ final class HealthController
      */
     public function health(Request $request, Response $response): Response
     {
-        return $this->renderer->json($response, $this->health->status());
+        return $this->jsonRenderer->json($response, $this->health->status());
     }
 }

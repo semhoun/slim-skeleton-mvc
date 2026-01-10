@@ -2,3 +2,6 @@
 vendor/
 var/*
 composer.lock
+.aider*
+.idea
+.phpunit.cache

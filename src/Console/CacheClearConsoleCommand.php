@@ -55,6 +55,7 @@ final class CacheClearConsoleCommand extends Command
         foreach ($files as $file) {
             is_dir($file) ? $this->removeDirectory($file) : unlink($file);
         }
+
         rmdir($path);
     }
 }
