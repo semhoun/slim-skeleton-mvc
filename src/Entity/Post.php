@@ -21,8 +21,7 @@ final class Post implements \JsonSerializable
         private string $content,
         #[ORM\Column(name: 'title', type: 'string', length: 100, nullable: true)]
         private ?string $title = null
-    )
-    {
+    ) {
     }
 
     /*

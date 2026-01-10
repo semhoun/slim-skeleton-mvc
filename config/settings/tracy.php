@@ -33,7 +33,7 @@ return [
     'showIncludedFiles' => 0,
     'showConsolePanel' => 0,
     'configs' => [
-        'ShowBar' => getenv('DISABLE_TRACY_BAR', true) !== 'true' ? 1 : 0,
+        'ShowBar' => env('DISABLE_TRACY_BAR', false) !== true ? 1 : 0,
         'XDebugHelperIDEKey' => 'PHPSTORM',
         'ConsoleEnable' => 0,
         'ConsoleNoLogin' => 0,

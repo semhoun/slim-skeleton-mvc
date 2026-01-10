@@ -9,6 +9,6 @@ return [
     'config' => [
         'cache' => Settings::getAppRoot() . '/var/cache/twig',
         'debug' => true,
-        'auto_reload' => getenv('DEBUG_MODE', true) === 'true',
+        'auto_reload' => env('DEBUG_MODE', true),
     ],
 ];

@@ -20,7 +20,7 @@ This project is ideal for quickly starting the development of an API or a web ap
 * **Debugging:** [Tracy](https://tracy.nette.org/) integrated via [slim-tracy](https://github.com/semhoun/slim-tracy)
 * **Sessions:** [Odan Session 6.4](https://github.com/odan/session) with secure storage
 * **Migrations:** [Doctrine Migrations 3.9](https://github.com/doctrine/migrations)
-* **Environment:** [vlucas/phpdotenv 5.6](https://github.com/vlucas/phpdotenv) for configuration
+* **Environment:** [vlucas/phpdotenv 5.6](https://github.com/vlucas/phpdotenv) for configuration (supports `.env` files, system environment variables, and mandatory variables using `env_required(['VAR1', 'VAR2'])`
 * **Proxy Support:** Built-in proxy detection middleware
 
 ## 🛠️ Requirements
@@ -42,12 +42,12 @@ composer create-project semhoun/slim-skeleton-mvc [your-app]
 
 ### 2. Configuration
 
-1. Copy the `.env.dist` file to `.env` and adjust the settings:
+1. Copy the `.env.example` file to `.env`:
 ```bash
-cp .env.dist .env
+cp .env.example .env
 ```
 
-2. By default, the application uses a **SQLite** database located in `var/database.sqlite`. For production, configure your database in `.env` file.
+2. By default, the application uses a **SQLite** database located in `var/database.sqlite`. For production, configure your database and other settings in the `.env` file or via **environment variables**.
 
 3. Initialize the database:
 ```bash

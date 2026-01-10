@@ -7,8 +7,8 @@ use Monolog\Level;
 
 return [
     'name' => 'app',
-    'path' => getenv('DOCKER_MODE', true) === 'true' ?
+    'path' => env('DOCKER_MODE', true) ?
             'php://stdout'
             : Settings::getAppRoot() . '/var/log/app.log',
-    'level' => getenv('DEBUG_MODE', true) === 'true' ? Level::Debug : Level::Info,
+    'level' => env('DEBUG_MODE', true) ? Level::Debug : Level::Info,
 ];

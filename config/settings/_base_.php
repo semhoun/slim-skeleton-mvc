@@ -8,7 +8,7 @@ return [
     // version, currently juste php version
     'version' => '4.2.0',
     // Is debug moderm
-    'debug' => getenv('DEBUG_MODE', true) === 'true',
+    'debug' => env('DEBUG_MODE', true),
     // API Base path
     'api_base_path' => '/api',
     // 'Temprorary directory

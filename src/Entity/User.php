@@ -30,8 +30,7 @@ final class User
         private string $username,
         #[ORM\Column(name: 'password', type: 'string', length: 60, nullable: false)]
         private string $password
-    )
-    {
+    ) {
     }
 
     /*
