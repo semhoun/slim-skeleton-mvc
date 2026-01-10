@@ -20,10 +20,10 @@ final readonly class BlogController
     /**
      * @param $id Id of post to view
      */
-    public function view(Request $request, Response $response, int $id): Response
+    public function view(Request $request, Response $response, int $idPost): Response
     {
         try {
-            $post = $this->entityManager->getRepository(\App\Entity\Post::class)->find($id);
+            $post = $this->entityManager->getRepository(\App\Entity\Post::class)->find($idPost);
         } catch (\Exception $exception) {
             throw new \Slim\Exception\HttpInternalServerErrorException($request, $exception->getMessage());
         }

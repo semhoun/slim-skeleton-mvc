@@ -5,3 +5,4 @@ composer.lock
 .aider*
 .idea
 .phpunit.cache
+compose.yml

@@ -7,41 +7,91 @@ This project is ideal for quickly starting the development of an API or a web ap
 
 ## 🚀 Features
 
-* **Framework:** [Slim 4](http://www.slimframework.com/)
-* **Dependency Injection Container:** [PHP-DI](http://php-di.org/)
-* **ORM:** [Doctrine 3](https://github.com/doctrine/orm) with SQLite by default
-* **Template Engine:** [Twig 3](https://twig.symfony.com/)
-* **Logging:** [Monolog](https://github.com/Seldaek/monolog)
-* **Console:** [Symfony Console](https://github.com/symfony/console)
-* **Code Quality:** [PHP Insights](https://phpinsights.com/) & [Rector](https://getrector.com/)
+* **Framework:** [Slim 4.15](http://www.slimframework.com/) (PSR-7, PSR-15, PSR-17)
+* **PHP Version:** 8.4+ required
+* **Dependency Injection Container:** [PHP-DI 7.0](http://php-di.org/) with autowiring
+* **ORM:** [Doctrine ORM 3.5](https://github.com/doctrine/orm) with [DBAL 4.4](https://github.com/doctrine/dbal)
+* **Database:** SQLite by default (supports MySQL, PostgreSQL via configuration)
+* **Template Engine:** [Twig 3.4](https://twig.symfony.com/)
+* **API Support:** RESTful API skeleton with JSON rendering
+* **Logging:** [Monolog 3.9](https://github.com/Seldaek/monolog) with multiple handlers
+* **Console:** [Symfony Console 6.4](https://github.com/symfony/console) with custom commands
+* **Code Quality:** [PHP Insights 2.13](https://phpinsights.com/) & [Rector 2.2](https://getrector.com/)
 * **Debugging:** [Tracy](https://tracy.nette.org/) integrated via [slim-tracy](https://github.com/semhoun/slim-tracy)
-* **Sessions:** [Odan Session](https://github.com/odan/session)
-* **Migrations:** [Doctrine Migrations](https://github.com/doctrine/migrations)
+* **Sessions:** [Odan Session 6.4](https://github.com/odan/session) with secure storage
+* **Migrations:** [Doctrine Migrations 3.9](https://github.com/doctrine/migrations)
+* **Environment:** [vlucas/phpdotenv 5.6](https://github.com/vlucas/phpdotenv) for configuration
+* **Proxy Support:** Built-in proxy detection middleware
+
+## 🛠️ Requirements
+
+* PHP 8.4 or higher
+* Composer 2.0 or higher
+* SQLite extension (or MySQL/PostgreSQL for production)
+* Required PHP extensions: json, pdo, pdo_sqlite
 
 ## 🛠️ Installation
 
 ### 1. Create the project
+
 Use Composer to install the project:
+
 ```bash
 composer create-project semhoun/slim-skeleton-mvc [your-app]
 ```
 
 ### 2. Configuration
-By default, the application uses a **SQLite** database located in `var/database.sqlite`.
 
-Initialize the database:
+1. Copy the `.env.dist` file to `.env` and adjust the settings:
+```bash
+cp .env.dist .env
+```
+
+2. By default, the application uses a **SQLite** database located in `var/database.sqlite`. For production, configure your database in `.env` file.
+
+3. Initialize the database:
 ```bash
 ./console migrations:migrate
 ```
 
+4. (Optional) Generate Doctrine proxies:
+```bash
+./console orm:generate-proxies
+```
+
 ### 3. Run the application
+
 You can use the PHP built-in development server:
 ```bash
 composer start
 ```
+
+Or use the console command:
+```bash
+./console serve
+```
+
 The application will be accessible at [http://localhost:8080](http://localhost:8080).
 
-## 🧪 Tests & Quality
+### 4. Available Console Commands
+
+```bash
+# Clear application cache
+./console cache:clear
+
+# Initialize cache
+./console cache:init
+
+# Generate Doctrine proxies
+./console orm:generate-proxies
+
+# Run development server
+./console serve
+
+# List all available commands
+./console list
+```
+## 🧪 Development Tools
 
 Run unit tests:
 ```bash
@@ -58,7 +108,16 @@ Apply automatic Rector fixes:
 composer rector-fix
 ```
 
-## 🐳 Docker (Example)
+Fix code style issues:
+```bash
+composer insights-fix
+```
+
+Run pre-commit checks (code style + rector + dos2unix):
+```bash
+composer pre-commit
+```
+
 
 A `compose.yml` file is provided to facilitate deployment. Here is a configuration example:
 
@@ -66,21 +125,13 @@ A `compose.yml` file is provided to facilitate deployment. Here is a configurati
 services:
   slim:
     image: semhoun/webserver
-    container_name: slim-app
-    restart: always
     ports:
       - "8080:80"
     volumes:
-      - .:/var/www/html
+      - .:/www
     environment:
       - APP_ENV=dev
       - DEBUG_MODE=true
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
 ```
 
 To launch the environment with Docker:
@@ -91,9 +142,22 @@ docker compose up -d
 
 ## 📝 Notes
 
-- Ensure that the `var` folder has write permissions.
-- Default credentials: **admin** / **admin**.
-- The project includes an error rendering system (HTML/JSON) based on the `Accept` header.
+* Ensure that the `var` folder has write permissions (for cache, logs, database)
+* Default credentials: **admin** / **admin** (change in production!)
+* The project includes an error rendering system (HTML/JSON) based on the `Accept` header
+* API routes are prefixed with `/api` (configurable in `config/settings/_base_.php`)
+
+## 📚 Documentation
+
+* [Slim Framework Documentation](https://www.slimframework.com/docs/)
+* [Doctrine ORM Documentation](https://www.doctrine-project.org/projects/orm.html)
+* [Twig Documentation](https://twig.symfony.com/doc/3.x/)
+* [PHP-DI Documentation](https://php-di.org/doc/)
 
 ## 📄 License
+
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+## 🔄 Changelog
+
+See the [CHANGELOG.md](CHANGELOG.md) file for version history and upcoming changes.
