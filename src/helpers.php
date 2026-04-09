@@ -8,9 +8,6 @@ if (! function_exists('env')) {
     /**
      * Gets the value of an environment variable.
      *
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
      * @throws \RuntimeException
      */
     function env(string $key, mixed $default = null): mixed
@@ -24,6 +21,7 @@ if (! function_exists('env')) {
             if (file_exists($appRoot . '/.env')) {
                 $dotenv->load();
             }
+
             $dotenvLoaded = true;
         }
 
@@ -33,6 +31,7 @@ if (! function_exists('env')) {
             } catch (\Dotenv\Exception\ValidationException $e) {
                 throw new \RuntimeException($e->getMessage(), (int) $e->getCode(), $e);
             }
+
             return null;
         }
 
@@ -42,22 +41,13 @@ if (! function_exists('env')) {
             return $default;
         }
 
-        switch (strtolower((string) $value)) {
-            case 'true':
-            case '(true)':
-                return true;
-            case 'false':
-            case '(false)':
-                return false;
-            case 'empty':
-            case '(empty)':
-                return '';
-            case 'null':
-            case '(null)':
-                return null;
-        }
-
-        return $value;
+        return match (strtolower((string) $value)) {
+            'true', '(true)' => true,
+            'false', '(false)' => false,
+            'empty', '(empty)' => '',
+            'null', '(null)' => null,
+            default => $value,
+        };
     }
 }
 
@@ -66,7 +56,7 @@ if (! function_exists('env_required')) {
      * Validates that the given environment variables are set.
      *
      * @param array<int, string>|string $keys
-     * @return void
+     *
      * @throws \RuntimeException
      */
     function env_required(array|string $keys): void

@@ -10,7 +10,7 @@ return RectorConfig::configure()
         __DIR__ . '/config',
     ])
     ->withPhpSets(
-        php84: true
+        php85: true
     )
     ->withComposerBased(
         twig: true,
