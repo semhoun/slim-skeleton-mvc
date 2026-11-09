@@ -10,6 +10,8 @@ These instructions apply to the application built from this skeleton. Update the
 - Provision administrative accounts with `./console app:user:create username`, which prompts for a hidden password. Do not introduce seeded credentials.
 - Generate Doctrine proxies with `./console app:generate-proxies` before non-debug use. Keep entities non-final while using generated proxies.
 - Keep `var/` writable by the application and maintenance accounts, with shared permissions where necessary. Do not solve permission errors by granting world-write access.
+- Before launch, manually provision `FileSessionStore` storage as the application account: `mkdir -p var/sessions && chmod 700 var/sessions`. Keep this directory private, outside `public/`, owned by the application account, on a local POSIX filesystem on a single host. Do not share session files across hosts or relax mode `0700` for shared maintenance access.
+- Require `SESSION_SIGNING_KEY` (at least 32 bytes; generate with `php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'`) and an explicitly set `SESSION_ORIGIN`. Prefer a canonical origin (scheme, host and non-default port, no path). An explicitly empty or whitespace-only value disables Origin validation, but not CSRF; an absent variable remains an error. This mode uses `https://session.invalid` as the technical origin and JWT issuer, never the request Host. Switching modes changes the issuer and invalidates existing tokens. Keep the signing key private and stable across restarts. For local development use `http://localhost:8080`; use HTTPS outside localhost.
 - Never commit `.env`, credentials, database backups, generated caches, or `vendor/`. In a derived application, track `composer.lock` for reproducible deployments; adjust the inherited `.gitignore` accordingly.
 - Use the application's documented deployment configuration. Do not assume a particular container runtime, reverse proxy, network, or host filesystem layout.
 
@@ -24,15 +26,17 @@ These instructions apply to the application built from this skeleton. Update the
 ## Security
 - Enforce authentication and authorization on the server, not just in navigation or templates. The initial account model grants administrative access to every provisioned account; add explicit roles and permissions before introducing non-administrative users.
 - Logout is POST-only, and authentication changes regenerate the session ID.
+- Use `semhoun/slim-session` 1.0 and `SessionContext` for sessions. Migrating from the previous session implementation invalidates existing sessions; users must sign in again.
+- The library enforces mandatory CSRF for authenticated mutations; Origin validation is also enabled unless `SESSION_ORIGIN` is explicitly empty. Application middleware exposes Twig global `csrf_token` (`string|null`) and converts form `_csrf` to `X-CSRF-Token` only if that header is absent. Include hidden `_csrf` in every POST form, including login and logout. The shared layout's `csrf-token` meta tag and jQuery `ajaxSetup` supply the header for same-origin AJAX mutations only. Custom clients must send the token for the current session and, when enabled, an `Origin` matching `SESSION_ORIGIN`; never bypass enabled library checks.
 - Validate request types and required fields before calling typed application code. Return appropriate 4xx responses for invalid input and missing resources.
 - Return JSON with an explicit content type for API responses. Preserve Twig autoescaping and escape data inserted into HTML or client-side tables; JSON encoding alone does not make data safe for HTML.
 - Keep internal exception messages and traces in logs, not production responses. Keep debugging disabled in production; enabling `DEBUG_MODE` loads the optional Tracy development dependency.
-- Use Secure, HttpOnly, SameSite session cookies. Disable `SESSION_COOKIE_SECURE` only for local HTTP development. Trust forwarding headers only from exact proxy IPs configured in `TRUSTED_PROXIES`; an empty list ignores those headers.
+- The `__Host-slim-session` cookie is always Secure, HttpOnly and SameSite=Lax. `SESSION_COOKIE_SECURE` has been removed; never disable Secure. HTTPS is required outside localhost; local HTTP requires the browser's localhost Secure-cookie exception, otherwise use local HTTPS. Trust forwarding headers only from exact proxy IPs configured in `TRUSTED_PROXIES`; an empty list ignores those headers.
 - Use `env_required()` for mandatory configuration. `env()` loads `.env` once per process, prefers `$_ENV` over `getenv()`, and converts boolean/null/empty values. `APP_ENV` does not automatically select a settings file.
 
 ## Verification And Maintenance
 - Run `composer test` after changes. `phpunit.xml` defines unit tests in `tests/Services` and `tests/EnvHelperTest.php`, and functional tests in `tests/Controller`; extend these suites as the application grows.
-- Functional tests use `tests/TestCaseBase.php` with the real middleware stack, an isolated SQLite in-memory database, and MemorySession. Do not use the application's live database for tests.
+- Functional tests use `tests/TestCaseBase.php` with the real middleware stack, an isolated SQLite in-memory database, and `SessionContext` backed by `InMemorySessionStore`. Do not use the application's live database or session files for tests.
 - Run focused checks with `vendor/bin/phpunit --testsuite Unit` or `vendor/bin/phpunit path/to/Test.php --filter testMethodName`.
 - Run `composer audit`, `composer insights-check`, and `vendor/bin/rector process --dry-run`. Review dependency updates and add regression tests for security and behavior changes.
 - `composer pre-commit` modifies files through `dos2unix`, Insights, and Rector. Review its diff and avoid unrelated rewrites.

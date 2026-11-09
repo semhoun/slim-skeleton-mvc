@@ -12,9 +12,15 @@ use Doctrine\ORM\ORMSetup;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
-use Odan\Session\PhpSession;
-use Odan\Session\SessionInterface;
-use Odan\Session\SessionManagerInterface;
+use Semhoun\SlimSession\Clock\SystemClock;
+use Semhoun\SlimSession\Http\HttpConfig;
+use Semhoun\SlimSession\Http\SessionMiddleware;
+use Semhoun\SlimSession\Jwt\JwtService;
+use Semhoun\SlimSession\SessionConfig;
+use Semhoun\SlimSession\SessionManager;
+use Semhoun\SlimSession\Storage\FileSessionStore;
+use Semhoun\SlimSession\Storage\SessionStore;
+use Slim\Psr7\Factory\ResponseFactory;
 use Slim\Views\Twig;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
@@ -88,6 +94,56 @@ return [
 
         return $twig;
     },
-    SessionManagerInterface::class => static fn (SessionInterface $session): SessionInterface => $session,
-    SessionInterface::class => static fn (Settings $settings): PhpSession => new PhpSession($settings->get('session')),
+    SessionConfig::class => static fn (Settings $settings): SessionConfig => new SessionConfig(
+        namespace: $settings->get('session.namespace'),
+        idleLifetime: $settings->get('session.lifetime'),
+        cleanupProbabilityBasisPoints: 100
+    ),
+    SessionStore::class => static fn (Settings $settings): FileSessionStore => new FileSessionStore(
+        $settings->get('session.save_path')
+    ),
+    SessionManager::class => static fn (
+        SessionStore $store,
+        SessionConfig $config,
+        SystemClock $clock
+    ): SessionManager => new SessionManager($store, $config, $clock),
+    HttpConfig::class => static function (Settings $settings): HttpConfig {
+        $origin = $settings->get('session.origin');
+        if ($origin === null) {
+            env_required('SESSION_ORIGIN');
+        }
+
+        $origin = is_string($origin) ? trim($origin) : $origin;
+        $originRequired = $origin !== '';
+
+        return new HttpConfig(
+            transport: 'cookie',
+            // A fixed origin is still required by the library and used as the JWT issuer.
+            canonicalOrigin: $originRequired ? $origin : 'https://session.invalid',
+            cookieName: $settings->get('session.name'),
+            originRequired: $originRequired
+        );
+    },
+    JwtService::class => static function (Settings $settings, HttpConfig $http, SystemClock $clock): JwtService {
+        $key = $settings->get('session.signing_key');
+        if ($key === null) {
+            env_required('SESSION_SIGNING_KEY');
+        }
+
+        return new JwtService(
+            $clock,
+            $http->canonicalOrigin,
+            $settings->get('session.namespace'),
+            ['primary' => $key],
+            'primary',
+            lifetime: $settings->get('session.lifetime'),
+            renewalWindow: 600
+        );
+    },
+    SessionMiddleware::class => static fn (
+        SessionManager $manager,
+        JwtService $jwt,
+        HttpConfig $http,
+        SystemClock $clock
+    ): SessionMiddleware => new SessionMiddleware($manager, $jwt, $http, $clock, new ResponseFactory()),
 ];

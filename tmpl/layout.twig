@@ -4,6 +4,7 @@
 		<!-- Required meta tags -->
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="csrf-token" content="{{ csrf_token }}">
 
 		<!-- Bootstrap CSS -->
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
@@ -83,6 +84,7 @@
 					{%if uinfo %}
 						{{ uinfo.lastname }} {{ uinfo.firstname }}
                         <form action="{{ url_for('logout') }}" method="post" class="d-inline">
+                            <input type="hidden" name="_csrf" value="{{ csrf_token }}">
                             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
                         </form>
 					{% else %}
@@ -111,6 +113,16 @@
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+            if (!settings.crossDomain && !/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && token) {
+                xhr.setRequestHeader('X-CSRF-Token', token);
+            }
+        }
+    });
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.5/dist/bootstrap-table.min.js"></script>

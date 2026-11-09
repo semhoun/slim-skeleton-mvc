@@ -3,15 +3,17 @@
 declare(strict_types=1);
 
 use App\Middleware\BaseUrlMiddleware;
+use App\Middleware\SessionFormMiddleware;
+use App\Middleware\SessionResponseMiddleware;
 use App\Middleware\SessionSecurityMiddleware;
 use App\Renderer\HtmlErrorRenderer;
 use App\Renderer\JsonErrorRenderer;
 use App\Services\Settings;
 use Monolog\Logger;
-use Odan\Session\Middleware\SessionStartMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RKA\Middleware\ProxyDetection;
+use Semhoun\SlimSession\Http\SessionMiddleware;
 use Slim\App;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
@@ -21,7 +23,9 @@ return static function (App $app): void {
     $settings = $container->get(Settings::class);
 
     $app->add(SessionSecurityMiddleware::class);
-    $app->add(SessionStartMiddleware::class);
+    $app->add(SessionMiddleware::class);
+    $app->add(SessionFormMiddleware::class);
+    $app->add(SessionResponseMiddleware::class);
     $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
     $app->add(BaseUrlMiddleware::class);
 

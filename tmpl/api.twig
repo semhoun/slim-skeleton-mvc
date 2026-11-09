@@ -11,6 +11,10 @@
         <p>
             Sign in through the login form and preserve the session cookie for POST and DELETE.
             Send JSON with <code>Content-Type: application/json</code>.
+            Authenticated mutations also require <code>X-CSRF-Token</code> from the
+            <code>csrf-token</code> meta tag. When <code>SESSION_ORIGIN</code> is nonempty, an
+            <code>Origin</code> matching it is also required. Same-origin browser requests supply Origin automatically;
+            non-browser clients must send it explicitly when validation is enabled.
         </p>
 
         <h2 class="mt-4">

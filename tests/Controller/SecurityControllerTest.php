@@ -29,34 +29,48 @@ final class SecurityControllerTest extends TestCaseBase
         self::assertSame(0, $this->entityManager->getRepository(Post::class)->count([]));
     }
 
-    public function testLoginPersistsAuthenticationRotatesSessionAndLogoutClearsIt(): void
+    public function testLoginPersistsAuthenticationAcrossRequestsAndLogoutRevokesIt(): void
     {
         $user = new User('operator', password_hash('secure-password-123', PASSWORD_BCRYPT, ['cost' => 4]));
         $this->entityManager->persist($user);
         $this->entityManager->flush();
         $this->app->handle($this->createRequest('GET', '/member/login'));
-        $oldId = $this->session->getId();
+        self::assertNull($this->session);
         $request = $this->createRequest('POST', '/member/login')->withParsedBody([
             'uname' => 'operator', 'pswd' => 'secure-password-123',
         ]);
 
         $response = $this->app->handle($request);
         self::assertSame(302, $response->getStatusCode());
-        self::assertTrue($this->session->get('logged'));
-        self::assertSame($user->getId(), $this->session->get('uinfo')['id']);
-        self::assertNotSame($oldId, $this->session->getId());
+        self::assertTrue($this->session?->data['logged']);
+        self::assertSame($user->getId(), $this->session?->data['uinfo']['id']);
+        self::assertNotNull($this->session?->id);
+        $cookie = $this->cookie;
+        $id = $this->session->id;
+        $setCookie = $response->getHeaderLine('Set-Cookie');
+        self::assertStringStartsWith('__Host-slim-session=', $setCookie);
+        foreach (['; Path=/', '; Max-Age=', '; Secure', '; HttpOnly', '; SameSite=Lax'] as $flag) {
+            self::assertStringContainsString($flag, $setCookie);
+        }
+        self::assertStringNotContainsString('Domain=', $setCookie);
 
         $home = $this->app->handle($this->createRequest('GET', '/'));
         self::assertStringContainsString('Logout</button>', (string) $home->getBody());
+        self::assertFalse($home->hasHeader('Set-Cookie'));
+        self::assertSame($cookie, $this->cookie);
+        self::assertSame($id, $this->session?->id);
         self::assertSame(200, $this->app->handle($this->createRequest('GET', '/admin/database/User'))->getStatusCode());
 
-        $oldId = $this->session->getId();
         $request = $this->createRequest('POST', '/member/logout');
-        self::assertSame(302, $this->app->handle($request)->getStatusCode());
-        self::assertNull($this->session->get('logged'));
-        self::assertNull($this->session->get('uinfo'));
-        self::assertNotSame($oldId, $this->session->getId());
+        $response = $this->app->handle($request);
+        self::assertSame(302, $response->getStatusCode());
+        self::assertStringContainsString('__Host-slim-session=; Path=/; Max-Age=0;', $response->getHeaderLine('Set-Cookie'));
+        self::assertNull($this->session);
+        self::assertNull($this->cookie);
         self::assertSame(401, $this->app->handle($this->createRequest('GET', '/admin'))->getStatusCode());
+        self::assertSame(401, $this->app->handle($this->createRequest('GET', '/admin', [
+            'Cookie' => '__Host-slim-session=' . $cookie,
+        ]))->getStatusCode());
     }
 
     public function testLoginFormIsNotCached(): void
@@ -64,13 +78,16 @@ final class SecurityControllerTest extends TestCaseBase
         $response = $this->app->handle($this->createRequest('GET', '/member/login'));
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('no-store', $response->getHeaderLine('Cache-Control'));
+        self::assertFalse($response->hasHeader('Set-Cookie'));
+        self::assertNull($this->session);
+        self::assertNull($this->cookie);
     }
 
     public function testLogoutCannotBeTriggeredByGet(): void
     {
         $this->authenticate();
         self::assertSame(405, $this->app->handle($this->createRequest('GET', '/member/logout'))->getStatusCode());
-        self::assertTrue($this->session->get('logged'));
+        self::assertTrue($this->session?->data['logged']);
     }
 
     public function testInvalidLoginFieldTypeReturnsBadRequest(): void
@@ -89,7 +106,9 @@ final class SecurityControllerTest extends TestCaseBase
         $response = $this->app->handle($request);
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('Invalid login/password', (string) $response->getBody());
-        self::assertNull($this->session->get('logged'));
+        self::assertNull($this->session);
+        self::assertNull($this->cookie);
+        self::assertFalse($response->hasHeader('Set-Cookie'));
     }
 
     #[DataProvider('historicalAdminPasswords')]
@@ -103,7 +122,7 @@ final class SecurityControllerTest extends TestCaseBase
         ]);
         $response = $this->app->handle($request);
         self::assertSame($allowed ? 302 : 200, $response->getStatusCode());
-        self::assertSame($allowed, $this->session->get('logged', false));
+        self::assertSame($allowed, $this->session?->data['logged'] ?? false);
     }
 
     public static function historicalAdminPasswords(): array
@@ -180,9 +199,166 @@ final class SecurityControllerTest extends TestCaseBase
         self::assertStringContainsString(".text(data['title'])", $html);
     }
 
-    private function authenticate(): void
+    public function testLoginRotatesExistingSessionAndRejectsOldToken(): void
     {
-        $this->session->set('logged', true);
-        $this->session->set('uinfo', ['id' => 1, 'firstname' => 'Test', 'lastname' => 'Operator']);
+        $user = new User('operator', password_hash('secure-password-123', PASSWORD_BCRYPT, ['cost' => 4]));
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+        $this->authenticate();
+        $oldId = $this->session?->id;
+        $oldCookie = $this->cookie;
+        $oldCsrf = $this->session?->csrfToken;
+        $response = $this->app->handle($this->createRequest('POST', '/member/login')->withParsedBody([
+            'uname' => 'operator', 'pswd' => 'secure-password-123',
+        ]));
+        self::assertSame(302, $response->getStatusCode());
+        self::assertTrue($this->session?->data['logged']);
+        self::assertSame($user->getId(), $this->session?->data['uinfo']['id']);
+        self::assertNotSame($oldId, $this->session?->id);
+        self::assertNotSame($oldCookie, $this->cookie);
+        self::assertNotSame($oldCsrf, $this->session?->csrfToken);
+        self::assertSame(200, $this->app->handle($this->createRequest('GET', '/admin'))->getStatusCode());
+        self::assertSame(401, $this->app->handle($this->createRequest('GET', '/admin', [
+            'Cookie' => '__Host-slim-session=' . $oldCookie,
+        ]))->getStatusCode());
+    }
+
+    #[DataProvider('invalidMutationProofs')]
+    public function testAuthenticatedMutationsRejectInvalidOriginOrCsrf(?string $origin, ?string $csrf): void
+    {
+        $this->authenticate();
+        $headers = [];
+        if ($origin !== null && $origin !== 'current') {
+            $headers['origin'] = $origin;
+        }
+        if ($csrf !== null && $csrf !== 'current') {
+            $headers['x-csrf-token'] = $csrf;
+        }
+        $request = $this->createRequest('POST', '/api/post', $headers)->withParsedBody(['content' => 'forbidden']);
+        if ($origin === null) {
+            $request = $request->withoutHeader('Origin');
+        }
+        if ($csrf === null) {
+            $request = $request->withoutHeader('X-CSRF-Token');
+        }
+        $response = $this->app->handle($request);
+        self::assertSame(403, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
+        self::assertSame('no-store', $response->getHeaderLine('Cache-Control'));
+        self::assertSame('nosniff', $response->getHeaderLine('X-Content-Type-Options'));
+        $error = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame(403, $error['code']);
+        self::assertSame('403 Forbidden', $error['title']);
+        self::assertSame('Forbidden', $error['message']);
+        self::assertArrayNotHasKey('trace', $error);
+        self::assertSame(0, $this->entityManager->getRepository(Post::class)->count([]));
+        self::assertTrue($this->session?->data['logged']);
+    }
+
+    public static function invalidMutationProofs(): array
+    {
+        return [
+            'wrong origin' => ['https://evil.example', 'current'],
+            'missing origin' => [null, 'current'],
+            'missing csrf' => ['current', null],
+            'wrong csrf' => ['current', 'incorrect'],
+        ];
+    }
+
+    public function testFormCsrfIsAcceptedWithoutHeader(): void
+    {
+        $this->authenticate();
+        $request = $this->createRequest('POST', '/member/logout')
+            ->withoutHeader('X-CSRF-Token')
+            ->withParsedBody(['_csrf' => $this->session?->csrfToken]);
+        self::assertSame(302, $this->app->handle($request)->getStatusCode());
+        self::assertNull($this->session);
+        self::assertNull($this->cookie);
+    }
+
+    public function testExplicitInvalidCsrfHeaderOverridesValidFormToken(): void
+    {
+        $this->authenticate();
+        $request = $this->createRequest('POST', '/member/logout', [
+            'origin' => 'http://localhost', 'x-csrf-token' => 'incorrect',
+        ])->withParsedBody(['_csrf' => $this->session?->csrfToken]);
+        self::assertSame('incorrect', $request->getHeaderLine('X-CSRF-Token'));
+        self::assertSame(403, $this->app->handle($request)->getStatusCode());
+        self::assertTrue($this->session?->data['logged']);
+    }
+
+    #[DataProvider('publicBrowserPages')]
+    public function testRevokedCookieRecoversPublicPages(string $path): void
+    {
+        $this->authenticate();
+        $cookie = $this->cookie;
+        $this->app->handle($this->createRequest('POST', '/member/logout'));
+        $response = $this->app->handle($this->createRequest('GET', $path, [
+            'Accept' => 'text/html', 'Cookie' => '__Host-slim-session=' . $cookie,
+        ]));
+        self::assertSame(302, $response->getStatusCode());
+        self::assertSame($path, $response->getHeaderLine('Location'));
+        self::assertStringContainsString('Max-Age=0', $response->getHeaderLine('Set-Cookie'));
+        self::assertSame('no-store', $response->getHeaderLine('Cache-Control'));
+        self::assertSame(200, $this->app->handle($this->createRequest('GET', $path))->getStatusCode());
+    }
+
+    public static function publicBrowserPages(): array
+    {
+        return [['/'], ['/member/login?return=home'], ['/api_info']];
+    }
+
+    public function testMalformedCookieRecoversLoginWithoutReplayingPost(): void
+    {
+        $headers = ['Cookie' => '__Host-slim-session=not-a-jwt'];
+        $response = $this->app->handle($this->createRequest('POST', '/member/login', $headers)
+            ->withParsedBody(['uname' => 'operator', 'pswd' => 'secure-password-123']));
+        self::assertSame(401, $response->getStatusCode());
+        self::assertFalse($response->hasHeader('Location'));
+        $response = $this->app->handle($this->createRequest('GET', '/admin', $headers));
+        self::assertSame(401, $response->getStatusCode());
+        self::assertFalse($response->hasHeader('Location'));
+        $response = $this->app->handle($this->createRequest('GET', '/member/login', $headers));
+        self::assertSame(302, $response->getStatusCode());
+        self::assertSame('/member/login', $response->getHeaderLine('Location'));
+    }
+
+    public function testRevokedCookieReturnsJsonAndDeletionHeaderForApi(): void
+    {
+        $this->authenticate();
+        $cookie = $this->cookie;
+        $this->app->handle($this->createRequest('POST', '/member/logout'));
+        $response = $this->app->handle($this->createRequest('GET', '/api/post', [
+            'Accept' => 'text/html', 'Cookie' => '__Host-slim-session=' . $cookie,
+        ]));
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
+        self::assertSame(401, json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR)['code']);
+        self::assertStringContainsString('Max-Age=0', $response->getHeaderLine('Set-Cookie'));
+        self::assertFalse($response->hasHeader('Location'));
+    }
+
+    public function testEmptySessionErrorStatusesKeepTheirCodeAndSafeJsonFormat(): void
+    {
+        foreach ([401, 403, 409, 503] as $status) {
+            $this->app->get('/api/session-error-' . $status, static fn (
+                \Psr\Http\Message\ServerRequestInterface $request,
+                \Psr\Http\Message\ResponseInterface $response
+            ): \Psr\Http\Message\ResponseInterface => $response->withStatus($status)
+                ->withHeader('Retry-After', '3'));
+        }
+
+        foreach ([401, 403, 409, 503] as $status) {
+            $response = $this->app->handle($this->createRequest('GET', '/api/session-error-' . $status));
+            self::assertSame($status, $response->getStatusCode());
+            self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
+            self::assertSame('3', $response->getHeaderLine('Retry-After'));
+            $error = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+            self::assertSame($status, $error['code']);
+            self::assertArrayNotHasKey('trace', $error);
+            if ($status === 503) {
+                self::assertSame('An internal server error occurred.', $error['message']);
+            }
+        }
     }
 }

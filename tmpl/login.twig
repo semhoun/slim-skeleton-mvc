@@ -4,6 +4,7 @@
     <h1>Login</h1>
 	<div class="bg-light p-5 rounded">
 		<form action="{{ url_for('login') }}" method="post">
+			<input type="hidden" name="_csrf" value="{{ csrf_token }}">
 			<div class="row mb-3">
 				<label class="col-sm-2 col-form-label" for="exampleInputUsername">Username</label>
 				<div class="col-sm-10">

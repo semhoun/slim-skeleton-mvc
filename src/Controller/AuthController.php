@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Doctrine\ORM\EntityManager;
-use Odan\Session\SessionInterface;
-use Odan\Session\SessionManagerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Semhoun\SlimSession\Http\SessionGuard;
+use Semhoun\SlimSession\SessionContext;
+use Semhoun\SlimSession\SessionState;
 use Slim\Exception\HttpBadRequestException;
 use Slim\Views\Twig;
 
@@ -16,9 +17,7 @@ final readonly class AuthController
 {
     public function __construct(
         private Twig $twig,
-        private EntityManager $entityManager,
-        private SessionInterface $session,
-        private SessionManagerInterface $sessionManager
+        private EntityManager $entityManager
     ) {
     }
 
@@ -33,8 +32,11 @@ final readonly class AuthController
 
     public function logout(Request $request, Response $response): Response
     {
-        $this->session->clear();
-        $this->sessionManager->regenerateId();
+        $session = SessionGuard::context($request);
+        if ($session->state() === SessionState::Open) {
+            $session->destroy();
+        }
+
         return $response->withStatus(302)->withHeader('Location', '/');
     }
 
@@ -66,7 +68,7 @@ final readonly class AuthController
             return $this->renderLoginError($response, 'Invalid login/password', $request);
         }
 
-        $this->createSession($uinfo);
+        $this->createSession($uinfo, SessionGuard::context($request));
 
         return $response->withStatus(302)->withHeader('Location', '/');
     }
@@ -79,12 +81,16 @@ final readonly class AuthController
         ]);
     }
 
-    private function createSession(\App\Entity\User $user): void
+    private function createSession(\App\Entity\User $user, SessionContext $session): void
     {
-        $this->session->clear();
-        $this->sessionManager->regenerateId();
-        $this->session->set('logged', true);
-        $this->session->set('uinfo', [
+        if ($session->state() === SessionState::Absent) {
+            $session->create();
+        } else {
+            $session->rotate(false);
+        }
+
+        $session->set('logged', true);
+        $session->set('uinfo', [
             'id' => $user->getId(),
             'firstname' => $user->getFirstName(),
             'lastname' => $user->getLastName(),

@@ -3,14 +3,10 @@
 declare(strict_types=1);
 
 return [
-    'name' => 'slim_session',
+    'name' => '__Host-slim-session',
+    'namespace' => 'slim_skeleton',
     'lifetime' => 7200,
-    'save_path' => null,
-    'domain' => null,
-    'secure' => env('SESSION_COOKIE_SECURE', env('DEBUG_MODE', false) !== true) === true,
-    'httponly' => true,
-    'cookie_samesite' => 'Lax',
-    'use_strict_mode' => 1,
-    'use_only_cookies' => 1,
-    'cache_limiter' => 'nocache',
+    'save_path' => \App\Services\Settings::getAppRoot() . '/var/sessions',
+    'origin' => env('SESSION_ORIGIN'),
+    'signing_key' => env('SESSION_SIGNING_KEY'),
 ];
