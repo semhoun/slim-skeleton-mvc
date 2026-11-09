@@ -6,14 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [4.2.0] - 2026-11-09
+
 ### Added
+- Opt-in AJAX/API profiling with slim-tracy 1.2, including a request history, correlated response timings, and a dedicated interface at `/_tracy/api`. Enable it with both `DEBUG_MODE=true` and `TRACY_API_PROFILER=true`.
 - Administrative account creation with `./console app:user:create username`, using a hidden password prompt and confirmation.
 - An explicit opt-out for Origin validation using an empty `SESSION_ORIGIN`; CSRF protection remains mandatory. Changing between this mode and a configured origin requires users to sign in again.
 - `TRUSTED_PROXIES` configuration to restrict forwarded headers to explicitly trusted proxy IP addresses.
+- Configurable API base paths, route caching, and temporary storage paths.
+- Cache maintenance through `cache:clear` and `cache:init`, and Doctrine proxy generation through `app:generate-proxies`.
+- Environment configuration through vlucas/phpdotenv.
 - Project guidance for applications built from this skeleton.
 
 ### Changed
 - PHP 8.5 or later is now required.
+- Updated Slim to the 4.15 series and integrated Doctrine ORM 3.5 with DBAL 4.4.
+- Upgraded slim-tracy to 1.2. Development debugging currently requires PHP 8.5 and the `mbstring` extension; slim-tracy does not yet support PHP 8.6.
+- Tracy now observes responses after Slim's error handling, so handled JSON errors can be profiled without changing their status or body.
 - Replaced `odan/session` with `semhoun/slim-session` 1.0 for server-backed sessions. Existing users must sign in again after upgrading.
 - Session setup now requires a private `var/sessions` directory with mode `0700`, a `SESSION_SIGNING_KEY` of at least 32 bytes, and an explicitly set `SESSION_ORIGIN`. See the README for deployment instructions.
 - Opening the login form no longer creates a session; sessions are created only after successful authentication.
@@ -31,12 +41,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - API post creation no longer requires an unused `slug` field; invalid request field types return validation errors.
 - Restored migration discovery while preserving existing migration identities, and fixed migration simulations on a fresh database.
 - Routing errors are now handled consistently, preserving native 404 and 405 responses.
+- Profiler routes work with PHP-DI controller injection and application base paths.
 - Restored Doctrine proxy generation for production use.
 - Cache clearing now removes hidden entries, continues past inaccessible entries, and reports permission failures instead of claiming success.
 - JSON rendering preserves numeric strings and handles invalid UTF-8 in text and error messages.
 
 ### Removed
 - The `SESSION_COOKIE_SECURE` option. Session cookies are always Secure; local HTTP development requires the browser's localhost exception, otherwise use local HTTPS.
+- Native Tracy AJAX interception and its `X-Tracy-Ajax` header behavior, removed upstream in slim-tracy 1.2. Use the opt-in profiler and built-in fetch/XHR client instead; collected responses use `X-SlimTracy-Profile`.
+- Global slim-tracy debugging shortcuts, replaced upstream by `SlimTracy\Debug` methods.
 
 ### Security
 - Removed seeded administrative credentials and added a migration to remove existing accounts still using the historical default password. Accounts with customized passwords are preserved; the cleanup cannot be reversed.
@@ -50,30 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cache clearing no longer follows directory symlinks outside the cache tree.
 - Private environment files are ignored by Git.
 - Updated Slim, Twig, and Symfony dependencies to address known security advisories.
-
-## [4.2.0] - 2026-01-10
-### Added
-- PHP 8.4 support
-- Doctrine ORM 3.5 and DBAL 4.4 integration
-- API base path configuration in settings
-- Temporary path configuration for file operations
-- Route caching configuration
-- New console commands: `cache:clear`, `cache:init`, `orm:generate-proxies`, `serve`
-- Environment variable support via vlucas/phpdotenv
-- Proxy detection middleware
-- Enhanced Docker configuration with MySQL support
-- Comprehensive documentation in README
-
-### Changed
-- Upgraded to Slim 4.15
-- Updated all dependencies to latest stable versions
-- Improved error handling and rendering system
-- Enhanced configuration system with environment variables
-- Modernized Docker setup with proper volume management
-- Improved code quality tools configuration
-
-### Fixed
-- Various bug fixes and stability improvements
+- API profiling is disabled by default, uses private bounded storage outside the web root, and defaults to same-origin access. Profiler endpoints are unauthenticated and share history across users: enable them only on a protected development network, as raw SQL may contain sensitive values. Hiding the Tracy bar does not disable profiling.
 
 ## [4.1.0] - 2024-09-01
 ### Added

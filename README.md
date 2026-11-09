@@ -17,7 +17,7 @@ This project is ideal for quickly starting the development of an API or a web ap
 * **Logging:** [Monolog 3.9](https://github.com/Seldaek/monolog) with multiple handlers
 * **Console:** [Symfony Console 6.4](https://github.com/symfony/console) with custom commands
 * **Code Quality:** [PHP Insights 2.13](https://phpinsights.com/) & [Rector 2.2](https://getrector.com/)
-* **Debugging:** [Tracy](https://tracy.nette.org/) integrated via [slim-tracy](https://github.com/semhoun/slim-tracy)
+* **Debugging:** [Tracy](https://tracy.nette.org/) integrated via [slim-tracy 1.2](https://github.com/semhoun/slim-tracy), with opt-in AJAX/API profiling
 * **Sessions:** [semhoun/slim-session 1.0](https://github.com/semhoun/slim-session) with `SessionContext`, server-side storage and mandatory CSRF protection
 * **Migrations:** [Doctrine Migrations 3.9](https://github.com/doctrine/migrations)
 * **Environment:** [vlucas/phpdotenv 5.6](https://github.com/vlucas/phpdotenv) for configuration (supports `.env` files, system environment variables, and mandatory variables using `env_required(['VAR1', 'VAR2'])`
@@ -28,6 +28,8 @@ This project is ideal for quickly starting the development of an API or a web ap
 * PHP 8.5 or higher
 * Composer 2.0 or higher
 * Required PHP extensions: json, pdo, pdo_sqlite
+
+Development debugging with slim-tracy 1.2 requires PHP 8.5 for this project and the `mbstring` extension. The debugger currently supports PHP versions below 8.6.
 
 ## Installation
 
@@ -138,6 +140,34 @@ Run automatic pre-commit fixes (mutates files; requires `dos2unix`):
 composer pre-commit
 ```
 
+### AJAX/API Profiling
+
+Install development dependencies with `composer install`. Tracy loads only when `DEBUG_MODE=true`; API profiling requires a separate explicit opt-in. Set these values in your local `.env`:
+
+```dotenv
+DEBUG_MODE=true
+TRACY_API_PROFILER=true
+```
+
+Restart the development server after changing environment settings. Open a rendered application page to load Tracy's built-in fetch/XHR instrumentation, then trigger AJAX requests. The existing jQuery requests are supported without additional scripts or changes to session and CSRF handling.
+
+The API panel appears in the Tracy bar. A dedicated interface is available at `http://localhost:8080/_tracy/api` when using `composer start`. The routes also honor a configured Slim base path. Collected responses include an `X-SlimTracy-Profile` correlation header; handled JSON errors retain their status and body and are also profiled.
+
+**Enable profiling only on a protected development network.** The profiler endpoints are unauthenticated, and profiles are shared across users and sessions. Application login does not protect or isolate this history. Raw SQL may contain sensitive values, even though SQL bindings and request bodies are excluded from stored exports by default. Cross-origin access is not enabled by the application's default configuration.
+
+Settings live under `configs.AjaxProfiler` in `config/settings/tracy.php`:
+
+| Setting | Default |
+| --- | --- |
+| Storage directory | `var/tmp/api-profiles`, outside `public/` |
+| Retention | 600 seconds |
+| Maximum profiles | 100 |
+| Maximum profile size | 256 KiB |
+| Maximum total size | 10 MiB |
+
+The library creates private profile storage with restrictive permissions. Keep it writable by the application account and outside the web root. Hiding the Tracy bar with `DISABLE_TRACY_BAR=true` does not disable profiling. Set `TRACY_API_PROFILER=false` to disable collection and access to the profiler endpoints; `DEBUG_MODE=false` prevents their registration entirely.
+
+When upgrading from slim-tracy 1.1, native Tracy AJAX interception is no longer available, even with the new profiler disabled. Do not restore the old `X-Tracy-Ajax` header or custom interception scripts. The 1.2 integration uses the built-in client and explicitly registered profiler routes. Global debug shortcuts were also removed upstream; use `SlimTracy\Debug` methods for new debugging calls.
 
 ## Authentication And API
 
@@ -164,6 +194,7 @@ Serve only the `public/` directory over HTTPS. Configure these environment value
 
 ```dotenv
 DEBUG_MODE=false
+TRACY_API_PROFILER=false
 TRUSTED_PROXIES=
 ```
 

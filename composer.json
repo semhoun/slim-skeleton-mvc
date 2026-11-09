@@ -59,7 +59,7 @@
     "roave/security-advisories": "dev-latest",
     "nunomaduro/phpinsights": "^2.13",
     "rector/rector": "^2.2",
-    "semhoun/slim-tracy": "^1.1",
+    "semhoun/slim-tracy": "^1.2",
     "phpunit/phpunit": "^10"
   },
   "scripts": {

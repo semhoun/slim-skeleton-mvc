@@ -63,5 +63,16 @@ return [
             'logDirectory' => null,
             'email' => null,
         ],
+        'AjaxProfiler' => [
+            // Shared, unauthenticated profiles: protected development networks only.
+            'enabled' => env('TRACY_API_PROFILER', false) === true,
+            'origins' => [],
+            'path' => '/_tracy/api',
+            'storageDirectory' => Settings::getAppRoot() . '/var/tmp/api-profiles',
+            'ttl' => 600,
+            'maxProfiles' => 100,
+            'maxProfileBytes' => 262144,
+            'maxTotalBytes' => 10485760,
+        ],
     ],
 ];

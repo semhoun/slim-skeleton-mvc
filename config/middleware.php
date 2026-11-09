@@ -38,12 +38,7 @@ return static function (App $app): void {
     $app->addRoutingMiddleware();
 
     // Add error handling middleware.
-    if ($settings->get('debug')) {
-        $app->add(new SlimTracy\Middlewares\TracyMiddleware($app, $settings->get('tracy')));
-        $errorMiddleware = $app->addErrorMiddleware(true, true, true, $container->get(Logger::class));
-    } else {
-        $errorMiddleware = $app->addErrorMiddleware(false, true, true, $container->get(Logger::class));
-    }
+    $errorMiddleware = $app->addErrorMiddleware($settings->get('debug'), true, true, $container->get(Logger::class));
 
     $errorHandler = $errorMiddleware->getDefaultErrorHandler();
     $errorHandler->registerErrorRenderer('text/html', HtmlErrorRenderer::class);
@@ -66,4 +61,9 @@ return static function (App $app): void {
             ->withHeader('Cache-Control', 'no-store')
             ->withHeader('X-Content-Type-Options', 'nosniff');
     });
+
+    // Wrap Slim's error handler so handled error responses are also profiled.
+    if ($settings->get('debug')) {
+        $app->add(new SlimTracy\Middlewares\TracyMiddleware($app, $settings->get('tracy')));
+    }
 };

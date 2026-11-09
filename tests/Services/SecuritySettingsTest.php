@@ -19,7 +19,11 @@ final class SecuritySettingsTest extends TestCase
     protected function setUp(): void
     {
         env('SKELETON_TEST_PRIME');
-        foreach (['DEBUG_MODE', 'SESSION_COOKIE_SECURE', 'SESSION_SIGNING_KEY', 'SESSION_ORIGIN', 'TRUSTED_PROXIES'] as $key) {
+        $keys = [
+            'DEBUG_MODE', 'TRACY_API_PROFILER', 'SESSION_COOKIE_SECURE',
+            'SESSION_SIGNING_KEY', 'SESSION_ORIGIN', 'TRUSTED_PROXIES',
+        ];
+        foreach ($keys as $key) {
             $this->environment[$key] = [array_key_exists($key, $_ENV), $_ENV[$key] ?? null, getenv($key)];
             unset($_ENV[$key]);
             putenv($key);
@@ -49,6 +53,24 @@ final class SecuritySettingsTest extends TestCase
         self::assertSame(Settings::getAppRoot() . '/var/sessions', $settings->get('session.save_path'));
         self::assertSame([], $settings->get('trusted_proxies'));
         self::assertSame([], $settings->get('tracy.configs.ConsoleAccounts'));
+        self::assertFalse($settings->get('tracy.configs.AjaxProfiler.enabled'));
+        self::assertSame([], $settings->get('tracy.configs.AjaxProfiler.origins'));
+        self::assertSame(
+            Settings::getAppRoot() . '/var/tmp/api-profiles',
+            $settings->get('tracy.configs.AjaxProfiler.storageDirectory')
+        );
+    }
+
+    public function testApiProfilerRequiresExplicitOptInEvenInDebugMode(): void
+    {
+        $_ENV['DEBUG_MODE'] = 'true';
+        self::assertFalse(Settings::load()->get('tracy.configs.AjaxProfiler.enabled'));
+
+        $_ENV['TRACY_API_PROFILER'] = 'true';
+        self::assertTrue(Settings::load()->get('tracy.configs.AjaxProfiler.enabled'));
+
+        $_ENV['TRACY_API_PROFILER'] = '1';
+        self::assertFalse(Settings::load()->get('tracy.configs.AjaxProfiler.enabled'));
     }
 
     public function testDebugCannotDisableCookieSecurityAndTrustedProxiesAreExplicit(): void
