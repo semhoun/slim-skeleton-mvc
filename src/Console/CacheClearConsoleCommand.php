@@ -21,13 +21,16 @@ final class CacheClearConsoleCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $cacheDirs = [$this->settings->get('cache_dir')];
-        foreach ($cacheDirs as $cacheDir) {
-            if (! file_exists($cacheDir)) {
-                continue;
-            }
+        $cacheDir = $this->settings->get('cache_dir');
+        if (! is_dir($cacheDir)) {
+            return Command::SUCCESS;
+        }
 
+        try {
             $this->removeDirectoryContent($cacheDir);
+        } catch (\RuntimeException $runtimeException) {
+            $output->writeln('<error>' . $runtimeException->getMessage() . '</error>');
+            return Command::FAILURE;
         }
 
         return Command::SUCCESS;
@@ -35,27 +38,25 @@ final class CacheClearConsoleCommand extends Command
 
     private function removeDirectoryContent(string $path): void
     {
-        $files = glob($path . '/*');
-        if ($files === false) {
-            return;
+        $errors = [];
+        foreach (new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS) as $file) {
+            try {
+                $filename = $file->getPathname();
+                if ($file->isDir() && ! $file->isLink()) {
+                    $this->removeDirectoryContent($filename);
+                    if (! @rmdir($filename)) {
+                        throw new \RuntimeException('Cannot remove cache directory: ' . $filename);
+                    }
+                } elseif (! @unlink($filename)) {
+                    throw new \RuntimeException('Cannot remove cache file: ' . $filename);
+                }
+            } catch (\RuntimeException $runtimeException) {
+                $errors[] = $runtimeException->getMessage();
+            }
         }
 
-        foreach ($files as $file) {
-            is_dir($file) ? $this->removeDirectory($file) : unlink($file);
+        if ($errors !== []) {
+            throw new \RuntimeException(implode(PHP_EOL, $errors));
         }
-    }
-
-    private function removeDirectory(string $path): void
-    {
-        $files = glob($path . '/*');
-        if ($files === false) {
-            return;
-        }
-
-        foreach ($files as $file) {
-            is_dir($file) ? $this->removeDirectory($file) : unlink($file);
-        }
-
-        rmdir($path);
     }
 }

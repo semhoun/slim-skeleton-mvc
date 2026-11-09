@@ -13,12 +13,16 @@ final class JsonRenderer
         mixed $data = null,
     ): ResponseInterface {
         $body = '<html><body><pre>'
-            . json_encode($data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)
+            . htmlspecialchars(
+                json_encode($data, JSON_PRETTY_PRINT | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR),
+                ENT_QUOTES | ENT_SUBSTITUTE,
+                'UTF-8'
+            )
             . '</pre></body></html>';
 
         $response->getBody()->write($body);
 
-        return $response;
+        return $response->withHeader('Content-Type', 'text/html; charset=UTF-8');
     }
 
     public function json(
@@ -28,9 +32,9 @@ final class JsonRenderer
         $response = $response->withHeader('Content-Type', 'application/json');
 
         $response->getBody()->write(
-            (string) json_encode(
+            json_encode(
                 $data,
-                JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR
+                JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR
             )
         );
 

@@ -28,11 +28,10 @@
              url: "{{ url_for('adminDatabasesInfo') }}"
          })
           .done(function(data) {
-              let selOptions = '<option value="">Choose...</option>';
+              const select = $('#database').empty().append(new Option('Choose...', ''));
               for (let i = 0; i < data.length; i++) {
-                  selOptions = selOptions + '<option value="' + data[i]['id'] + '">' + data[i]['title'] + '</option>';
+                  select.append(new Option(data[i]['title'], data[i]['id']));
               }
-              $('#database').html(selOptions);
           });
 
          $('#database').on("shown.bs.select",
@@ -44,12 +43,20 @@
              e.preventDefault();
 
              $.ajax({
-                 url: "{{ url_for('admin') }}/database/" + $('#database').val()
+                 url: "{{ url_for('admin') }}/database/" + encodeURIComponent($('#database').val())
              })
               .done(function(data) {
                   $('#table').bootstrapTable('destroy');
-                  $('#database_title').html(data['title']);
-                  $('#table').bootstrapTable(data);
+                  $('#database_title').text(data['title']);
+                  for (const column of data.columns) {
+                      if (column.field === 'action') {
+                          column.formatter = function(value, row) {
+                              const href = "{{ url_for('blog', {id: 0})|e('js') }}".replace(/0$/, encodeURIComponent(String(row.id)));
+                              return $('<a>', {href: href, text: 'View'}).prop('outerHTML');
+                          };
+                      }
+                  }
+                  $('#table').bootstrapTable({...data, escape: true});
               });
          });
      });

@@ -46,11 +46,5 @@ if (! $settings->get('debug')) {
     $app->getRouteCollector()->setCacheFile($settings->get('cache_dir').'/route');
 }
 
-// Add the routing middleware.
-$app->addRoutingMiddleware();
-
-// Add Body Parsing Middleware
-$app->addBodyParsingMiddleware();
-
 // Run the app
 $app->run();

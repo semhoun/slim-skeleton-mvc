@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Renderer;
 
-use App\Services\Settings;
 use Monolog\Logger;
+use Slim\Exception\HttpException;
 use Slim\Interfaces\ErrorRendererInterface;
 use Slim\Views\Twig;
 use Throwable;
@@ -14,7 +14,6 @@ final readonly class HtmlErrorRenderer implements ErrorRendererInterface
 {
     public function __construct(
         private Twig $twig,
-        private Settings $settings,
         private Logger $logger,
     ) {
     }
@@ -23,23 +22,21 @@ final readonly class HtmlErrorRenderer implements ErrorRendererInterface
         Throwable $exception,
         bool $displayErrorDetails
     ): string {
+        $code = $exception instanceof HttpException ? $exception->getCode() : 500;
+        $safe = $displayErrorDetails || ($code >= 400 && $code < 500);
         $data = [
-            'title' => is_a($exception, '\Slim\Exception\HttpException') ?
-                $exception->getTitle() : '500 - ' .  $exception::class,
-            'code' => $exception->getCode(),
-            'message' => $exception->getMessage(),
+            'title' => $safe && $exception instanceof HttpException ?
+                $exception->getTitle() : ($code === 500 ? '500 Internal Server Error' : $code . ' Server Error'),
+            'code' => $code,
+            'message' => $safe ? $exception->getMessage() : 'An internal server error occurred.',
         ];
 
-        if ($exception->getCode() === 404) {
+        if ($code === 404) {
             return $this->twig->fetch('error/404.twig', $data);
         }
 
         $details = $this->getErrorDetails($exception, $displayErrorDetails);
-        $this->logger->error('[' . $exception->getCode() . '] ' . $exception->getMessage(), $details);
-
-        if ($this->settings->get('debug')) {
-            throw $exception;
-        }
+        $this->logger->error('[' . $code . '] ' . $exception->getMessage(), $details);
 
         return $this->twig->fetch('error/default.twig', $displayErrorDetails ? array_merge($data, $details) : $data);
     }

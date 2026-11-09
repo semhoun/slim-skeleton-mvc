@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Services\Settings;
 use Doctrine\ORM\Configuration;
-use Tracy\Debugger;
 use Twig\Profiler\Profile;
 
 // terminal.js full URI
@@ -37,9 +36,7 @@ return [
         'XDebugHelperIDEKey' => 'PHPSTORM',
         'ConsoleEnable' => 0,
         'ConsoleNoLogin' => 0,
-        'ConsoleAccounts' => [
-            'dev' => '34c6fceca75e456f25e7e99531e2425c6c1de443', // = sha1('dev')
-        ],
+        'ConsoleAccounts' => [],
         'ConsoleHashAlgorithm' => 'sha1',
         'ConsoleHomeDirectory' => Settings::getAppRoot(),
         // terminal.js full URI
@@ -60,8 +57,9 @@ return [
             'Twig' => Profile::class,
         ],
         'Debugger' => [
-            // See \Tracy\Debugger::enable
-            'mode' => Debugger::Development,
+            // Tracy accepts true for production and false for development.
+            // Avoid loading this optional development dependency in production.
+            'mode' => env('DEBUG_MODE', false) !== true,
             'logDirectory' => null,
             'email' => null,
         ],

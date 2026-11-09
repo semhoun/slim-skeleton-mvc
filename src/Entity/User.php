@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: 'user')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-final class User
+class User
 {
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
@@ -28,7 +28,7 @@ final class User
     public function __construct(
         #[ORM\Column(name: 'username', type: 'string', length: 30, nullable: false)]
         private string $username,
-        #[ORM\Column(name: 'password', type: 'string', length: 60, nullable: false)]
+        #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: false)]
         private string $password
     ) {
     }

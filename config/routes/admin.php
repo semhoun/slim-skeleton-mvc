@@ -10,7 +10,9 @@ return static function (
 ): void {
     $app->group('/admin', static function (Group $group): void {
         $group->get('', [\App\Controller\AdminController::class, 'view'])->setName('admin');
-        $group->get('/database', [\App\Controller\AdminController::class, 'databasesInfo'])->setName('adminDatabasesInfo');
-        $group->get('/database/{id}', [\App\Controller\AdminController::class, 'databaseExport'])->setName('adminDatabaseExport');
-    });
+        $group->get('/database', [\App\Controller\AdminController::class, 'databasesInfo'])
+            ->setName('adminDatabasesInfo');
+        $group->get('/database/{id}', [\App\Controller\AdminController::class, 'databaseExport'])
+            ->setName('adminDatabaseExport');
+    })->add(\App\Middleware\AuthenticationMiddleware::class);
 };

@@ -5,7 +5,12 @@
 
     <div class="bg-light p-5 rounded">
         <p>
-            This skeleton, provide an API exemple.
+            This skeleton provides a JSON API example. Reading posts is public.
+            Creating and deleting posts requires an authenticated administrative session.
+        </p>
+        <p>
+            Sign in through the login form and preserve the session cookie for POST and DELETE.
+            Send JSON with <code>Content-Type: application/json</code>.
         </p>
 
         <h2 class="mt-4">
@@ -28,7 +33,7 @@
                         </td>
 
 					    <td>
-                            <a href="{{ url_for('apiPostGetAll') }}">/api/post</a>
+                            <a href="{{ url_for('apiPostGetAll') }}">{{ url_for('apiPostGetAll') }}</a>
                         </td>
 					    <td>
                             Get All posts
@@ -40,7 +45,7 @@
                         </td>
 
 					    <td>
-                            /api/post/{id}
+                            {{ url_for('apiPostGetAll') }}/{id}
                         </td>
 					    <td>
                             Get a post identified by is id
@@ -52,7 +57,7 @@
                         </td>
 
 					    <td>
-                            /api/post
+                            {{ url_for('apiPostGetAll') }}
                         </td>
 					    <td>
                             Add a post, JSON body must be:<br>
@@ -69,7 +74,7 @@
                         </td>
 
 					    <td>
-                            /api/post/{id}
+                            {{ url_for('apiPostGetAll') }}/{id}
                         </td>
 					    <td>
                             Delete a post identified by is id

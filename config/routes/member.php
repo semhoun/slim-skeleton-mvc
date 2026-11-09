@@ -10,6 +10,7 @@ return static function (
 ): void {
     $app->group('/member', static function (Group $group): void {
         $group->map(['GET', 'POST'], '/login', [\App\Controller\AuthController::class, 'login'])->setName('login');
-        $group->get('/logout', [\App\Controller\AuthController::class, 'logout'])->setName('logout');
+        $group->post('/logout', [\App\Controller\AuthController::class, 'logout'])->setName('logout')
+            ->add(\App\Middleware\AuthenticationMiddleware::class);
     });
 };

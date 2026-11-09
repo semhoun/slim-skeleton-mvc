@@ -10,5 +10,5 @@ return [
     'path' => env('DOCKER_MODE', true) ?
             'php://stdout'
             : Settings::getAppRoot() . '/var/log/app.log',
-    'level' => env('DEBUG_MODE', true) ? Level::Debug : Level::Info,
+    'level' => env('DEBUG_MODE', false) === true ? Level::Debug : Level::Info,
 ];

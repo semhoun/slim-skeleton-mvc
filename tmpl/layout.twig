@@ -82,7 +82,9 @@
 				<div>
 					{%if uinfo %}
 						{{ uinfo.lastname }} {{ uinfo.firstname }}
-						<a class="btn btn-outline-success my-2 my-sm-0" href="{{ url_for('logout') }}">Logout</a>
+                        <form action="{{ url_for('logout') }}" method="post" class="d-inline">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
+                        </form>
 					{% else %}
 						<a class="btn btn-outline-success my-2 my-sm-0" href="{{ url_for('login') }}">Login</a>
 					{% endif %}

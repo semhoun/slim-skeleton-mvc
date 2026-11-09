@@ -5,15 +5,20 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Doctrine\ORM\EntityManager;
+use Odan\Session\SessionInterface;
+use Odan\Session\SessionManagerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Exception\HttpBadRequestException;
 use Slim\Views\Twig;
 
 final readonly class AuthController
 {
     public function __construct(
         private Twig $twig,
-        private EntityManager $entityManager
+        private EntityManager $entityManager,
+        private SessionInterface $session,
+        private SessionManagerInterface $sessionManager
     ) {
     }
 
@@ -28,17 +33,29 @@ final readonly class AuthController
 
     public function logout(Request $request, Response $response): Response
     {
-        $session = $request->getAttribute('session');
-        $session['logged'] = false;
-        unset($session['uinfo']);
+        $this->session->clear();
+        $this->sessionManager->regenerateId();
         return $response->withStatus(302)->withHeader('Location', '/');
     }
 
     private function handleLoginPost(Request $request, Response $response): Response
     {
         $data = $request->getParsedBody();
+        if (! is_array($data)) {
+            throw new HttpBadRequestException($request, 'Expected a login form or JSON object.');
+        }
+
         $uname = $data['uname'] ?? '';
         $pswd = $data['pswd'] ?? '';
+
+        if (! is_string($uname)
+            || ! is_string($pswd)
+            || mb_strlen($uname) > 30
+            || strlen($pswd) > 72
+            || str_contains($pswd, "\0")
+        ) {
+            throw new HttpBadRequestException($request, 'Invalid login/password format.');
+        }
 
         if ($uname === '' || $pswd === '') {
             return $this->renderLoginError($response, 'Empty value in login/password', $request);
@@ -49,7 +66,7 @@ final readonly class AuthController
             return $this->renderLoginError($response, 'Invalid login/password', $request);
         }
 
-        $this->createSession($request, $uinfo);
+        $this->createSession($uinfo);
 
         return $response->withStatus(302)->withHeader('Location', '/');
     }
@@ -62,20 +79,26 @@ final readonly class AuthController
         ]);
     }
 
-    private function createSession(Request $request, \App\Entity\User $user): void
+    private function createSession(\App\Entity\User $user): void
     {
-        $session = $request->getAttribute('session');
-        $session['logged'] = true;
-        $session['uinfo'] = [
+        $this->session->clear();
+        $this->sessionManager->regenerateId();
+        $this->session->set('logged', true);
+        $this->session->set('uinfo', [
             'id' => $user->getId(),
             'firstname' => $user->getFirstName(),
             'lastname' => $user->getLastName(),
             'email' => $user->getEmail(),
-        ];
+        ]);
     }
 
     private function auth(string $uname, string $pswd): ?\App\Entity\User
     {
+        // Refuse the historical seed credentials even before cleanup is migrated.
+        if ($uname === 'admin' && $pswd === 'admin') {
+            return null;
+        }
+
         $uinfo = $this->entityManager->getRepository(\App\Entity\User::class)->findOneByUsername($uname);
         if ($uinfo === null) {
             return null;

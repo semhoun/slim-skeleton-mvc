@@ -20,12 +20,16 @@ final readonly class BlogController
     /**
      * @param $id Id of post to view
      */
-    public function view(Request $request, Response $response, int $idPost): Response
+    public function view(Request $request, Response $response, int $id): Response
     {
         try {
-            $post = $this->entityManager->getRepository(\App\Entity\Post::class)->find($idPost);
+            $post = $this->entityManager->getRepository(\App\Entity\Post::class)->find($id);
         } catch (\Exception $exception) {
-            throw new \Slim\Exception\HttpInternalServerErrorException($request, $exception->getMessage());
+            throw new \Slim\Exception\HttpInternalServerErrorException($request, $exception->getMessage(), $exception);
+        }
+
+        if ($post === null) {
+            throw new \Slim\Exception\HttpNotFoundException($request, 'Post not found');
         }
 
         return $this->twig->render($response, 'blog.twig', [ 'post' => $post ]);

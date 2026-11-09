@@ -2,6 +2,9 @@
 vendor/
 var/*
 composer.lock
+.env
+.env.*
+!.env.example
 .aider*
 .idea
 .phpunit.cache

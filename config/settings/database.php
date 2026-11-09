@@ -19,7 +19,7 @@ return [
                 'execution_time_column_name' => 'execution_time',
             ],
             'migrations_paths' => [
-                'app' => Settings::getAppRoot() . '/migrations',
+                'Skeleton' => Settings::getAppRoot() . '/migrations',
             ],
             'all_or_nothing' => true,
             'transactional' => true,

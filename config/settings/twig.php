@@ -8,7 +8,7 @@ return [
     'template_path' => Settings::getAppRoot() . '/tmpl',
     'config' => [
         'cache' => Settings::getAppRoot() . '/var/cache/twig',
-        'debug' => true,
-        'auto_reload' => env('DEBUG_MODE', true),
+        'debug' => env('DEBUG_MODE', false) === true,
+        'auto_reload' => env('DEBUG_MODE', false) === true,
     ],
 ];

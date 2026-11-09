@@ -34,6 +34,10 @@ final readonly class AdminController
 
     public function databaseExport(Request $request, Response $response, string $id): Response
     {
+        if (! in_array($id, ['User', 'Post'], true)) {
+            throw new \Slim\Exception\HttpNotFoundException($request, 'Unknown export.');
+        }
+
         $data = $this->entityManager->getRepository('\\App\\Entity\\' . $id)->adminExport();
         return $this->jsonRenderer->json($response, $data);
     }

@@ -23,7 +23,7 @@ use Twig\Extension\ProfilerExtension;
 
 return [
     // Doctrine Dbal connection
-    Connection::class => static function (Settings $settings, Doctrine\ORM\Configuration $configuration): Doctrine\DBAL\Connection {
+    Connection::class => static function (Settings $settings, Configuration $configuration): Connection {
         $connectionParams = [
             'driver' => 'pdo_' . $settings->get('database.driver'),
         ];
@@ -59,7 +59,10 @@ return [
         return $configuration;
     },
     // Doctrine EntityManager.
-    EntityManager::class => static fn (Configuration $configuration, Connection $connection): EntityManager => new EntityManager($connection, $configuration),
+    EntityManager::class => static fn (
+        Configuration $configuration,
+        Connection $connection
+    ): EntityManager => new EntityManager($connection, $configuration),
     EntityManagerInterface::class => DI\get(EntityManager::class),
     // Settings.
     Settings::class => DI\factory([Settings::class, 'load']),
@@ -75,6 +78,8 @@ return [
     },
     Twig::class => static function (Settings $settings, \Twig\Profiler\Profile $profile): Twig {
         $twig = Twig::create($settings->get('twig.template_path'), $settings->get('twig.config'));
+        $twig->getEnvironment()->addGlobal('base_url', '');
+        $twig->getEnvironment()->addGlobal('uinfo', null);
         if ($settings->get('debug')) {
             // Add extensions
             $twig->addExtension(new ProfilerExtension($profile));

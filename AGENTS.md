@@ -1,26 +1,39 @@
-# Repository Guidance
+# Project Guidance
+
+These instructions apply to the application built from this skeleton. Update them as the application's architecture, domain, commands, and deployment requirements evolve. Treat the supplied blog and CRUD endpoints as examples to adapt or replace, not as required business features.
 
 ## Setup And Commands
-- Use PHP 8.5 (`composer.json` requires `^8.5`; Rector targets PHP 8.5), not the README's PHP 8.4. Install with `composer install`; SQLite needs both the declared `sqlite3` extension and `pdo_sqlite` used by Doctrine.
-- Run `composer start` for the development server at `http://localhost:8080`, with `public/index.php` as the router. There is no `./console serve` command.
-- Initialize the SQLite database with `./console migrations:migrate`. Its path is fixed in `config/settings/database.php` to `var/database.sqlite`; database environment variables are not wired up.
-- Generate Doctrine proxies with `./console app:generate-proxies`, not the README's `orm:generate-proxies`. Use `./console list` to verify available commands.
-- Keep `var/` writable for the database, logs, templates, and generated caches. `vendor/`, `var/*`, and `composer.lock` are ignored; the lockfile is not tracked.
-- The local, ignored `compose.yml` is host-specific (absolute bind mounts, Traefik, external `internal` network), not a portable development setup.
+- Use the PHP version and extensions declared in `composer.json`, and keep the PHP target in `rector.php` aligned. Install dependencies with `composer install`.
+- Run `composer start` for local development at `http://localhost:8080`. Configure production servers with `public/` as the document root.
+- Configure persistence in `config/settings/database.php`. The initial configuration uses SQLite at `var/database.sqlite`; database environment variables take effect only when explicitly wired into the configuration.
+- Apply migrations with `./console migrations:migrate`. Back up existing application data before deploying migrations that change or remove it.
+- Provision administrative accounts with `./console app:user:create username`, which prompts for a hidden password. Do not introduce seeded credentials.
+- Generate Doctrine proxies with `./console app:generate-proxies` before non-debug use. Keep entities non-final while using generated proxies.
+- Keep `var/` writable by the application and maintenance accounts, with shared permissions where necessary. Do not solve permission errors by granting world-write access.
+- Never commit `.env`, credentials, database backups, generated caches, or `vendor/`. In a derived application, track `composer.lock` for reproducible deployments; adjust the inherited `.gitignore` accordingly.
+- Use the application's documented deployment configuration. Do not assume a particular container runtime, reverse proxy, network, or host filesystem layout.
 
-## Verification
-- `composer test` runs PHPUnit 10 using `phpunit.xml`: `Unit` covers `tests/Services`; `Functional` covers `tests/Controller`.
-- Focus a suite with `vendor/bin/phpunit --testsuite Unit`; focus a test with `vendor/bin/phpunit tests/Services/SettingsTest.php --filter testMethodName` (replace the method name).
-- `tests/EnvHelperTest.php` is outside both configured suites. Run it explicitly with `vendor/bin/phpunit tests/EnvHelperTest.php` when changing environment helpers. Its `testEnvThrowsExceptionForMandatoryVar` currently fails: it expects `env()` to enforce a mandatory variable, which only `env_required()` does.
-- Functional tests build the Slim app in-process through `tests/TestCaseBase.php`, without a running HTTP server. The not-found test logs a 404 stack trace even when the suite passes.
-- Read-only quality checks: `composer insights-check` and `vendor/bin/rector process --dry-run`. Rector scans only `src/` and `config/`.
-- `composer pre-commit` is a mutating script, not a test gate: it runs `dos2unix` first, then `composer insights-fix`, then `composer rector-fix`. It requires `dos2unix` and can change unrelated files.
-
-## Wiring And Gotchas
+## Architecture
 - HTTP bootstrapping lives in `public/index.php`; CLI bootstrapping lives in `console`. Both use `Settings::load()` and PHP-DI definitions in `config/dependencies.php`.
-- `Settings::load()` merges `config/settings/_base_.php` at the top level and each other `config/settings/*.php` under its filename stem. Access nested values with dot paths, e.g. `database.doctrine.entity_path`.
-- `config/routes.php` automatically loads every `config/routes/*.php` closure before installing the catch-all 404 route. API routes hardcode `/api` in `config/routes/api.php`; changing `api_base_path` alone does not move them.
-- Twig templates are in `tmpl/`; Doctrine uses attribute mapping from `src/Entity/`. Migrations are wired through `console` and `config/settings/database.php`, not a separate Doctrine CLI config.
-- `src/helpers.php` is Composer-autoloaded. `env()` loads the root `.env` once per process, prefers `$_ENV` over `getenv()`, and converts boolean/null/empty strings. Use `env_required()` for mandatory variables; `env('KEY')` alone returns null when absent.
-- `DEBUG_MODE` defaults to true and enables Tracy, which is a dev dependency. Set `DEBUG_MODE=false` when running without dev dependencies. `APP_ENV` does not select a separate settings file.
-- With debug disabled, the HTTP entrypoint caches the DI container and routes under `var/cache/`. After dependency or route changes, use `./console cache:clear`; it also removes Doctrine proxies, so regenerate them with `./console app:generate-proxies` before non-debug use.
+- `Settings::load()` merges `config/settings/_base_.php` at the top level and other `config/settings/*.php` files under their filename stem. Access nested values with dot paths, such as `database.doctrine.entity_path`.
+- Add route definitions under `config/routes/`; `config/routes.php` loads each closure. Use named routes in templates and honor `api_base_path` for API endpoints.
+- Register middleware in `config/middleware.php`. Slim executes middleware in reverse registration order: error handling must wrap routing, body parsing, and application middleware. Do not duplicate registration in the entrypoint or add a catch-all route that masks native 405 responses.
+- Keep HTTP handling in `src/Controller/`, reusable application logic in `src/Services/`, persistence queries in `src/Repository/`, Doctrine entities in `src/Entity/`, and Twig templates in `tmpl/`.
+- Add schema changes through migrations. The namespace in `migrations_paths` must match the migration classes. Preserve the identities of executed migrations; changing their namespace can make Doctrine treat them as new migrations.
+
+## Security
+- Enforce authentication and authorization on the server, not just in navigation or templates. The initial account model grants administrative access to every provisioned account; add explicit roles and permissions before introducing non-administrative users.
+- Logout is POST-only, and authentication changes regenerate the session ID.
+- Validate request types and required fields before calling typed application code. Return appropriate 4xx responses for invalid input and missing resources.
+- Return JSON with an explicit content type for API responses. Preserve Twig autoescaping and escape data inserted into HTML or client-side tables; JSON encoding alone does not make data safe for HTML.
+- Keep internal exception messages and traces in logs, not production responses. Keep debugging disabled in production; enabling `DEBUG_MODE` loads the optional Tracy development dependency.
+- Use Secure, HttpOnly, SameSite session cookies. Disable `SESSION_COOKIE_SECURE` only for local HTTP development. Trust forwarding headers only from exact proxy IPs configured in `TRUSTED_PROXIES`; an empty list ignores those headers.
+- Use `env_required()` for mandatory configuration. `env()` loads `.env` once per process, prefers `$_ENV` over `getenv()`, and converts boolean/null/empty values. `APP_ENV` does not automatically select a settings file.
+
+## Verification And Maintenance
+- Run `composer test` after changes. `phpunit.xml` defines unit tests in `tests/Services` and `tests/EnvHelperTest.php`, and functional tests in `tests/Controller`; extend these suites as the application grows.
+- Functional tests use `tests/TestCaseBase.php` with the real middleware stack, an isolated SQLite in-memory database, and MemorySession. Do not use the application's live database for tests.
+- Run focused checks with `vendor/bin/phpunit --testsuite Unit` or `vendor/bin/phpunit path/to/Test.php --filter testMethodName`.
+- Run `composer audit`, `composer insights-check`, and `vendor/bin/rector process --dry-run`. Review dependency updates and add regression tests for security and behavior changes.
+- `composer pre-commit` modifies files through `dos2unix`, Insights, and Rector. Review its diff and avoid unrelated rewrites.
+- After dependency or route changes, run `./console cache:clear` with an account permitted to remove the generated files, then `./console app:generate-proxies`. Non-debug HTTP bootstrapping caches the container and routes under `var/cache/`.

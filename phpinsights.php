@@ -71,6 +71,10 @@ return [
     ],
 
     'config' => [
+        // Doctrine's generated proxies extend entity classes.
+        \NunoMaduro\PhpInsights\Domain\Insights\ForbiddenNormalClasses::class => [
+            'exclude' => ['src/Entity'],
+        ],
         LineLengthSniff::class => [
             'lineLimit' => 120,
             'absoluteLineLimit' => 120,
