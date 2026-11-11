@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.1] - 2026-11-11
+
+### Changed
+- Updated `semhoun/slim-session` to 1.0.1. Successful authentication now starts a fresh session, discarding previous data and flash messages and resetting its lifetime instead of only rotating credentials.
+- Session JWTs become eligible for renewal halfway through their actual lifetime, including tokens shortened by the absolute session deadline, instead of using a fixed ten-minute renewal window.
+
+### Security
+- Adopted the library's safeguards against issuing new credentials after failed session creation or replacement. Reauthentication revokes the previous identity; a failed replacement does not restore it or automatically replay the operation.
+
 ## [4.2.0] - 2026-11-09
 
 ### Added

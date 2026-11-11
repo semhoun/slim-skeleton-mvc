@@ -136,8 +136,7 @@ return [
             $settings->get('session.namespace'),
             ['primary' => $key],
             'primary',
-            lifetime: $settings->get('session.lifetime'),
-            renewalWindow: 600
+            lifetime: $settings->get('session.lifetime')
         );
     },
     SessionMiddleware::class => static fn (

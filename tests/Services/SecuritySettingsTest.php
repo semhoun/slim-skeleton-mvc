@@ -156,4 +156,19 @@ final class SecuritySettingsTest extends TestCase
         $builder->addDefinitions(Settings::getAppRoot() . '/config/dependencies.php');
         self::assertSame(7200, $builder->build()->get(SessionConfig::class)->idleLifetime);
     }
+
+    public function testJwtRenewalUsesHalfTheActualTokenLifetime(): void
+    {
+        $_ENV['SESSION_ORIGIN'] = 'http://localhost:8080';
+        $_ENV['SESSION_SIGNING_KEY'] = str_repeat('test-secret-', 4);
+        $builder = new ContainerBuilder();
+        $builder->addDefinitions(Settings::getAppRoot() . '/config/dependencies.php');
+        $jwt = $builder->build()->get(JwtService::class);
+
+        self::assertSame(7200, $jwt->lifetime);
+        self::assertNull($jwt->renewalWindow);
+        self::assertSame(4600, $jwt->refreshAt(1000, 8200));
+        self::assertSame(1150, $jwt->refreshAt(1000, 1300));
+        self::assertSame(1151, $jwt->refreshAt(1000, 1301));
+    }
 }

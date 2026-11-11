@@ -8,6 +8,13 @@ use App\Entity\Post;
 use App\Entity\User;
 use App\Tests\TestCaseBase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\Clock\ClockInterface;
+use Semhoun\SlimSession\Clock\SystemClock;
+use Semhoun\SlimSession\Jwt\JwtService;
+use Semhoun\SlimSession\SessionConfig;
+use Semhoun\SlimSession\SessionManager;
+use Semhoun\SlimSession\SessionRecord;
+use Semhoun\SlimSession\Storage\SessionStore;
 
 final class SecurityControllerTest extends TestCaseBase
 {
@@ -199,28 +206,141 @@ final class SecurityControllerTest extends TestCaseBase
         self::assertStringContainsString(".text(data['title'])", $html);
     }
 
-    public function testLoginRotatesExistingSessionAndRejectsOldToken(): void
+    public function testLoginStartsFreshSessionAndRejectsOldCredentials(): void
     {
         $user = new User('operator', password_hash('secure-password-123', PASSWORD_BCRYPT, ['cost' => 4]));
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-        $this->authenticate();
-        $oldId = $this->session?->id;
+        $oldSession = $this->seedAgedSession();
         $oldCookie = $this->cookie;
-        $oldCsrf = $this->session?->csrfToken;
         $response = $this->app->handle($this->createRequest('POST', '/member/login')->withParsedBody([
             'uname' => 'operator', 'pswd' => 'secure-password-123',
         ]));
         self::assertSame(302, $response->getStatusCode());
-        self::assertTrue($this->session?->data['logged']);
-        self::assertSame($user->getId(), $this->session?->data['uinfo']['id']);
-        self::assertNotSame($oldId, $this->session?->id);
+        self::assertNotNull($this->session);
+        self::assertSame([
+            'logged' => true,
+            'uinfo' => [
+                'id' => $user->getId(),
+                'firstname' => $user->getFirstName(),
+                'lastname' => $user->getLastName(),
+                'email' => $user->getEmail(),
+            ],
+        ], $this->session->data);
+        self::assertSame([], $this->session->flash);
+        self::assertNotSame($oldSession->id, $this->session->id);
         self::assertNotSame($oldCookie, $this->cookie);
-        self::assertNotSame($oldCsrf, $this->session?->csrfToken);
+        self::assertNotSame($oldSession->csrfToken, $this->session->csrfToken);
+        self::assertNotSame($oldSession->verificationSecret, $this->session->verificationSecret);
+        self::assertStringStartsWith('__Host-slim-session=', $response->getHeaderLine('Set-Cookie'));
+        $container = $this->app->getContainer();
+        self::assertNull($container->get(SessionStore::class)->read(
+            $container->get(SessionConfig::class)->namespace,
+            $oldSession->id
+        ));
         self::assertSame(200, $this->app->handle($this->createRequest('GET', '/admin'))->getStatusCode());
+        self::assertSame(403, $this->app->handle($this->createRequest('POST', '/api/post', [
+            'X-CSRF-Token' => $oldSession->csrfToken,
+        ])->withParsedBody(['content' => 'forbidden']))->getStatusCode());
+        self::assertSame(0, $this->entityManager->getRepository(Post::class)->count([]));
         self::assertSame(401, $this->app->handle($this->createRequest('GET', '/admin', [
             'Cookie' => '__Host-slim-session=' . $oldCookie,
         ]))->getStatusCode());
+    }
+
+    public function testLoginResetsCreationTimeAndAbsoluteDeadline(): void
+    {
+        $user = new User('operator', password_hash('secure-password-123', PASSWORD_BCRYPT, ['cost' => 4]));
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+        $oldSession = $this->seedAgedSession();
+        $container = $this->app->getContainer();
+        $clock = $container->get(SystemClock::class);
+        $before = $clock->now()->getTimestamp();
+
+        $response = $this->app->handle($this->createRequest('POST', '/member/login')->withParsedBody([
+            'uname' => 'operator', 'pswd' => 'secure-password-123',
+        ]));
+
+        $after = $clock->now()->getTimestamp();
+        self::assertSame(302, $response->getStatusCode());
+        self::assertNotNull($this->session);
+        self::assertGreaterThan($oldSession->createdAt, $this->session->createdAt);
+        self::assertGreaterThanOrEqual($before, $this->session->createdAt);
+        self::assertLessThanOrEqual($after, $this->session->createdAt);
+        self::assertGreaterThan($oldSession->absoluteExpiresAt, $this->session->absoluteExpiresAt);
+        $config = $container->get(SessionConfig::class);
+        self::assertSame($this->session->createdAt + $config->absoluteLifetime, $this->session->absoluteExpiresAt);
+        self::assertSame($this->session->createdAt, $this->session->lastActivityAt);
+        self::assertSame(
+            min($this->session->createdAt + $config->idleLifetime, $this->session->absoluteExpiresAt),
+            $this->session->idleExpiresAt
+        );
+    }
+
+    public function testFailedLoginPreservesExistingSession(): void
+    {
+        $user = new User('operator', password_hash('secure-password-123', PASSWORD_BCRYPT, ['cost' => 4]));
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+        $oldSession = $this->seedAgedSession();
+        $oldCookie = $this->cookie;
+
+        $response = $this->app->handle($this->createRequest('POST', '/member/login')->withParsedBody([
+            'uname' => 'operator', 'pswd' => 'incorrect-password',
+        ]));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('Invalid login/password', (string) $response->getBody());
+        self::assertFalse($response->hasHeader('Set-Cookie'));
+        self::assertSame($oldCookie, $this->cookie);
+        self::assertNotNull($this->session);
+        self::assertSame($oldSession->id, $this->session->id);
+        self::assertSame($oldSession->data, $this->session->data);
+        self::assertSame($oldSession->flash, $this->session->flash);
+        self::assertSame($oldSession->createdAt, $this->session->createdAt);
+        self::assertSame($oldSession->absoluteExpiresAt, $this->session->absoluteExpiresAt);
+        self::assertSame($oldSession->verificationSecret, $this->session->verificationSecret);
+        self::assertSame($oldSession->csrfToken, $this->session->csrfToken);
+        self::assertSame(200, $this->app->handle($this->createRequest('GET', '/admin'))->getStatusCode());
+    }
+
+    private function seedAgedSession(): SessionRecord
+    {
+        $container = $this->app->getContainer();
+        $now = $container->get(SystemClock::class)->now();
+        $clock = new class ($now->modify('-120 seconds')) implements ClockInterface {
+            public function __construct(private readonly \DateTimeImmutable $time)
+            {
+            }
+
+            public function now(): \DateTimeImmutable
+            {
+                return $this->time;
+            }
+        };
+        // Only seeding uses historical time; requests retain the real application clock and store.
+        $manager = new SessionManager(
+            $container->get(SessionStore::class),
+            $container->get(SessionConfig::class),
+            $clock
+        );
+        $context = $manager->create([
+            'logged' => true,
+            'uinfo' => ['id' => 999, 'firstname' => 'Previous', 'lastname' => 'Account'],
+            'old_data' => ['private' => 'must not survive login'],
+        ], $now->getTimestamp() + 300);
+        $context->flash('old_notice', 'must not survive login');
+        $context->saveAndClose();
+        $this->session = $context->record();
+        self::assertNotNull($this->session);
+        $this->cookie = $container->get(JwtService::class)->issue(
+            $this->session->id,
+            $this->session->absoluteExpiresAt,
+            $this->session->verificationSecret
+        );
+
+        return $this->session;
     }
 
     #[DataProvider('invalidMutationProofs')]

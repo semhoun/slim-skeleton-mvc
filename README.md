@@ -18,7 +18,7 @@ This project is ideal for quickly starting the development of an API or a web ap
 * **Console:** [Symfony Console 6.4](https://github.com/symfony/console) with custom commands
 * **Code Quality:** [PHP Insights 2.13](https://phpinsights.com/) & [Rector 2.2](https://getrector.com/)
 * **Debugging:** [Tracy](https://tracy.nette.org/) integrated via [slim-tracy 1.2](https://github.com/semhoun/slim-tracy), with opt-in AJAX/API profiling
-* **Sessions:** [semhoun/slim-session 1.0](https://github.com/semhoun/slim-session) with `SessionContext`, server-side storage and mandatory CSRF protection
+* **Sessions:** [semhoun/slim-session 1.0.1](https://github.com/semhoun/slim-session) with `SessionContext`, server-side storage and mandatory CSRF protection
 * **Migrations:** [Doctrine Migrations 3.9](https://github.com/doctrine/migrations)
 * **Environment:** [vlucas/phpdotenv 5.6](https://github.com/vlucas/phpdotenv) for configuration (supports `.env` files, system environment variables, and mandatory variables using `env_required(['VAR1', 'VAR2'])`
 * **Proxy Support:** Built-in proxy detection middleware
@@ -181,6 +181,10 @@ All accounts provisioned by this skeleton have administrative access. There is n
 * Logout uses POST `/member/logout`. GET does not log out.
 * API POST requests accept `content` (required non-empty string) and `title` (optional string or null). No `slug` is required.
 * Preserve the session cookie when making API requests. The session ID changes on login and logout.
+
+Successful login uses `SessionContext::startNew()` on the middleware's existing context. It revokes any previous session and creates fresh identity, secrets, and creation/expiration deadlines without retaining old application data or flash messages. Replacement is not atomic: if creation fails after revocation, the old identity is not restored. Never automatically replay authentication or business operations after a storage failure.
+
+JWT renewal now uses the library's halfway point of the actual token lifetime, including tokens shortened by the session's absolute deadline, instead of a fixed ten-minute window. With the default two-hour JWT lifetime, renewal becomes eligible after one hour and occurs on a subsequent valid request. This application does not install the optional library browser client or background refresh endpoints.
 
 The application middleware exposes the Twig global `csrf_token` (`string|null`). POST forms, including login and logout, submit it as `_csrf`. The middleware converts that field to `X-CSRF-Token` only when the header is absent; an explicit header takes precedence. The session library always enforces CSRF checks for authenticated mutations and also validates Origin unless `SESSION_ORIGIN` is explicitly empty. Do not bypass enabled checks.
 

@@ -83,18 +83,14 @@ final readonly class AuthController
 
     private function createSession(\App\Entity\User $user, SessionContext $session): void
     {
-        if ($session->state() === SessionState::Absent) {
-            $session->create();
-        } else {
-            $session->rotate(false);
-        }
-
-        $session->set('logged', true);
-        $session->set('uinfo', [
-            'id' => $user->getId(),
-            'firstname' => $user->getFirstName(),
-            'lastname' => $user->getLastName(),
-            'email' => $user->getEmail(),
+        $session->startNew([
+            'logged' => true,
+            'uinfo' => [
+                'id' => $user->getId(),
+                'firstname' => $user->getFirstName(),
+                'lastname' => $user->getLastName(),
+                'email' => $user->getEmail(),
+            ],
         ]);
     }
 

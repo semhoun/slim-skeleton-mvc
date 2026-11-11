@@ -52,7 +52,7 @@
     "slim/twig-view": "^3.4",
     "twig/twig": "^3.30",
     "akrabat/proxy-detection-middleware": "^1.1",
-    "semhoun/slim-session": "^1.0",
+    "semhoun/slim-session": "^1.0.1",
     "vlucas/phpdotenv": "^5.6"
   },
   "require-dev": {
